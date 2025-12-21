@@ -46,7 +46,7 @@ function BookingForm() {
       />
 
       <button onClick={submitBooking} style={styles.button}>
-        ไปหน้าชำระเงิน
+        ไปหน้าชำระเงิน test
       </button>
     </div>
   );
