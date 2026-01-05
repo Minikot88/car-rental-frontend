@@ -3,14 +3,38 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /* Project primary color variables */
+  --primary: #FF0000;
+  --primary-2: #FF4D4D;
+
+  /* Color tokens (light theme defaults) */
+  --bg: #ffffff;
+  --surface: #fafafa;
+  --card: #ffffff;
+  --text: #212121;
+  --muted: #6b6b6b;
+  --nav-bg: var(--primary);
+  --shadow-elevation: 0 8px 22px rgba(0,0,0,0.08);
+
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--text);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark theme overrides should be top-level so the class toggle works */
+.theme-dark {
+  --bg: #0f1419;
+  --surface: #121418;
+  --card: #16191c;
+  --text: #e6eef6;
+  --muted: #9aa6b2;
+  --nav-bg: linear-gradient(90deg,var(--primary),var(--primary-2));
+  --shadow-elevation: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 a {
@@ -42,7 +66,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--surface);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -62,7 +86,5 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+  /* Prefer theme variables instead of hard-coded button color */
 }

@@ -16,7 +16,7 @@ function Home() {
         <div>
           <h1
             style={{
-              fontSize: "2.3rem",
+              fontSize: "2.6rem",
               fontWeight: 800,
               marginBottom: "0.6rem",
               lineHeight: "1.3",
@@ -71,7 +71,7 @@ function Home() {
         <div
           style={{
             position: "relative",
-            height: "230px",
+            height: "240px",
           }}
         >
           <div
@@ -79,7 +79,7 @@ function Home() {
               position: "absolute",
               inset: 0,
               background:
-                "radial-gradient(circle at 0% 0%, #ffb3b3, transparent 60%), radial-gradient(circle at 100% 100%, #ffe5e5, transparent 60%)",
+                "radial-gradient(circle at 10% 10%, #ffd6a5, transparent 50%), radial-gradient(circle at 90% 90%, #ffd6f5, transparent 50%)",
               borderRadius: "24px",
             }}
           />
@@ -87,39 +87,39 @@ function Home() {
           <div
             style={{
               position: "absolute",
-              inset: "16px",
-              background: "#fff",
-              borderRadius: "22px",
-              padding: "1.2rem 1.3rem",
-              boxShadow: "0 18px 42px rgba(0,0,0,0.15)",
+              inset: "14px",
+              background: "var(--card)",
+              borderRadius: "20px",
+              padding: "1.1rem 1.2rem",
+              boxShadow: "0 18px 42px rgba(0,0,0,0.12)",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
               {/* Left Text */}
               <div>
                 <div
                   style={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.82rem",
                     color: "var(--text-muted)",
-                    marginBottom: 4,
+                    marginBottom: 6,
                   }}
                 >
                   รถยอดนิยมประจำเดือน
                 </div>
                 <div
                   style={{
-                    fontWeight: 700,
-                    fontSize: "1.15rem",
+                    fontWeight: 800,
+                    fontSize: "1.18rem",
                   }}
                 >
                   Toyota Yaris 1.2
                 </div>
                 <div
                   style={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.82rem",
                     color: "var(--text-muted)",
                   }}
                 >
@@ -131,8 +131,9 @@ function Home() {
               <div style={{ textAlign: "right" }}>
                 <div
                   style={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.82rem",
                     color: "var(--text-muted)",
+                    marginBottom: 6,
                   }}
                 >
                   ราคาพิเศษเริ่มต้น
@@ -140,7 +141,7 @@ function Home() {
 
                 <div
                   style={{
-                    fontSize: "1.35rem",
+                    fontSize: "1.25rem",
                     fontWeight: 900,
                     color: "var(--primary)",
                   }}
@@ -161,16 +162,18 @@ function Home() {
 
             <div
               style={{
-                marginTop: "0.75rem",
+                marginTop: "0.6rem",
                 display: "flex",
                 justifyContent: "space-between",
-                fontSize: "0.82rem",
+                fontSize: "0.86rem",
               }}
             >
               <span>✓ รับ–คืนสนามบิน</span>
               <span>✓ ฟรีค่ามัดจำบัตรเครดิต</span>
             </div>
           </div>
+
+          <div style={{ position: "absolute", right: 18, top: 14, fontSize: 44 }}>🚗</div>
         </div>
       </section>
 
@@ -220,44 +223,49 @@ function Home() {
         </div>
       </section>
 
-      <style>
-        {`
-        :root {
-          --primary: #ff0000;
-          --text-muted: #777;
-        }
+      {/* Featured Cars */}
+      <section style={{ marginTop: "2rem" }}>
+        <div style={{ marginBottom: "1rem" }}>
+          <h2 style={{ textAlign: "center" }}>รถแนะนำสำหรับคุณ</h2>
+        </div>
 
-        .btn {
-          padding: 10px 16px;
-          font-size: 0.95rem;
-          border-radius: 8px;
-          cursor: pointer;
-          border: none;
-        }
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ ...styles.card, padding: "1rem" }}>
+            <div style={{ fontWeight: 800 }}>Honda City</div>
+            <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Sedan · 5 ที่นั่ง · ออโต้</div>
+            <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,350฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
+            <div style={{ marginTop: 12 }}>
+              <Link to="/cars"><button className="btn btn-outline">ดูรายละเอียด</button></Link>
+            </div>
+          </div>
 
-        .btn-primary {
-          background: var(--primary);
-          color: #fff;
-        }
+          <div style={{ ...styles.card, padding: "1rem" }}>
+            <div style={{ fontWeight: 800 }}>Toyota Yaris</div>
+            <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Eco car · 5 ที่นั่ง · ออโต้</div>
+            <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,200฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
+            <div style={{ marginTop: 12 }}>
+              <Link to="/cars"><button className="btn btn-outline">ดูรายละเอียด</button></Link>
+            </div>
+          </div>
 
-        .btn-outline {
-          background: transparent;
-          border: 2px solid var(--primary);
-          color: var(--primary);
-        }
+          <div style={{ ...styles.card, padding: "1rem" }}>
+            <div style={{ fontWeight: 800 }}>Mazda CX-3</div>
+            <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Crossover · 5 ที่นั่ง · ออโต้</div>
+            <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,700฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
+            <div style={{ marginTop: 12 }}>
+              <Link to="/cars"><button className="btn btn-outline">ดูรายละเอียด</button></Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        .btn-outline:hover {
-          background: var(--primary);
-          color: #fff;
-        }
-
-        @media (max-width: 900px) {
-          section:first-of-type {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}
-      </style>
+      {/* Removed inline :root and button styles to rely on global theme variables in src/index.css and src/styles/global.css */}
     </div>
   );
 }
@@ -266,7 +274,7 @@ export default Home;
 
 const styles = {
   card: {
-    background: "#fff",
+    background: "var(--card)",
     padding: "1.2rem",
     borderRadius: "10px",
     boxShadow: "0 4px 14px rgba(0,0,0,0.08)",

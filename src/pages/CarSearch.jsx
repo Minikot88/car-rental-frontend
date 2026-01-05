@@ -27,14 +27,6 @@ export default function CarSearch({ onSearch }) {
 
         <div style={styles.searchBox}>
           <input
-            name="location"
-            placeholder="เมือง หรือ สนามบิน"
-            value={form.location}
-            onChange={handleChange}
-            style={styles.field}
-          />
-
-          <input
             type="date"
             name="pickupDate"
             value={form.pickupDate}
@@ -117,7 +109,7 @@ const styles = {
   },
 
   ctaButton: {
-    backgroundColor: "#ff0000",
+    backgroundColor: "var(--primary)",
     color: "#fff",
     padding: "12px 20px",
     fontSize: "16px",

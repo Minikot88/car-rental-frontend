@@ -72,7 +72,7 @@ const styles = {
   searchBox: {
     display: "flex",
     gap: "10px",
-    background: "#fff",
+    background: "var(--card)",
     padding: "15px",
     borderRadius: "12px",
     boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
@@ -90,7 +90,7 @@ const styles = {
 
   searchButton: {
     padding: "12px 22px",
-    backgroundColor: "#ff0000",
+    backgroundColor: "var(--primary)",
     color: "#fff",
     fontSize: "15px",
     fontWeight: "600",
@@ -113,7 +113,7 @@ const styles = {
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "var(--card)",
     borderRadius: "14px",
     overflow: "hidden",
     boxShadow: "0 4px 18px rgba(0,0,0,0.08)",
@@ -154,12 +154,12 @@ const styles = {
   price: {
     fontSize: "18px",
     fontWeight: "700",
-    color: "#ff0000",
+    color: "var(--primary)",
   },
 
   button: {
     padding: "8px 14px",
-    backgroundColor: "#ff0000",
+    backgroundColor: "var(--primary)",
     color: "#fff",
     borderRadius: "6px",
     fontSize: "14px",

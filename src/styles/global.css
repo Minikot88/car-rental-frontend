@@ -1,7 +1,12 @@
 :root {
   --primary: #ff0000;
+  --primary-2: #FF4D4D;
   --text-muted: #777;
   --nav-bg: #202020;
+
+  /* Surfaces */
+  --surface: #fafafa;
+  --card: #ffffff;
 
   --max-width: 1280px;
 }
@@ -9,7 +14,8 @@
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: #fafafa;
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* Layout container */

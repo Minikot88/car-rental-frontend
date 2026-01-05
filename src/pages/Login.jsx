@@ -158,7 +158,7 @@ const styles = {
   buttonGradient: {
     width: "100%",
     padding: "12px",
-    background: "linear-gradient(135deg, #ff4d4d, #b30000)",
+    background: "linear-gradient(135deg, var(--primary-2), var(--primary))",
     border: "none",
     borderRadius: "8px",
     color: "white",
@@ -176,7 +176,7 @@ const styles = {
   },
 
   link: {
-    color: "#ff0000",
+    color: "var(--primary)",
     textDecoration: "none",
     fontWeight: "500",
   },
