@@ -1,0 +1,73 @@
+/* ================= SUB NAV ================= */
+.subnav {
+  position: fixed;
+  top: 64px; /* ใต้ Navbar */
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 900;
+
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+/* CONTAINER */
+.subnav-container {
+  max-width: 1200px;
+  height: 100%;
+  margin: auto;
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  overflow-x: auto;
+}
+
+/* ITEM */
+.subnav-item {
+  padding: 10px 16px;
+  border-radius: 999px;
+
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+  color: var(--text);
+  background: transparent;
+
+  transition: all 0.2s ease;
+}
+
+/* HOVER */
+.subnav-item:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ACTIVE */
+.subnav-item.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255, 0, 0, 0.35);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 640px) {
+  .subnav {
+    height: 52px;
+  }
+
+  .subnav-container {
+    justify-content: flex-start;
+  }
+
+  .subnav-item {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+}

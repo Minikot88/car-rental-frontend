@@ -1,62 +1,69 @@
-:root {
-  --primary: #ff0000;
-  --text-muted: #777;
-  --nav-bg: #202020;
+/* ================= THEME VARIABLES ================= */
 
-  --max-width: 1280px;
+/* ---------- LIGHT ---------- */
+:root {
+  /* BRAND */
+  --primary: #ff0000;
+  --primary-soft: #ffe5e5;
+
+  /* BACKGROUND */
+  --bg: #f6f7f9;
+  --card: #ffffff;
+
+  /* TEXT */
+  --text: #111827;
+  --text-muted: #6b7280;
+
+  /* BORDER / SHADOW */
+  --border: #e5e7eb;
+
+  /* LAYOUT */
+  --max-width: 1200px;
+}
+
+/* ---------- DARK ---------- */
+[data-theme="dark"] {
+  --primary: #ff0000;
+  --primary-soft: #3a0000;
+
+  --bg: #0f1115;
+  --card: #1b1f2a;
+
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+
+  --border: #2a2f3a;
+}
+
+/* ================= BASE RESET ================= */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #fafafa;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
-/* Layout container */
+/* ================= GLOBAL LAYOUT ================= */
 .container {
-  width: min(var(--max-width), 100%);
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 16px;
 }
 
-/* Responsive Grid Helper */
-.grid {
-  display: grid;
-  gap: 1rem;
+/* ================= UTILITIES ================= */
+.muted {
+  color: var(--text-muted);
 }
 
-.grid-2 {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.grid-4 {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-/* Buttons */
-.btn {
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-}
-.btn-outline:hover {
-  background: var(--primary);
-  color: #fff;
+.center {
+  text-align: center;
 }

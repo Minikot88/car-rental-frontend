@@ -1,0 +1,61 @@
+/* ================= THEME TOGGLE ================= */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+
+  background: var(--card);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  cursor: pointer;
+
+  font-weight: 700;
+  font-size: 0.85rem;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+/* ICON */
+.theme-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* LABEL */
+.theme-label {
+  white-space: nowrap;
+}
+
+/* COMPACT MODE (Navbar) */
+.theme-toggle-btn.compact {
+  padding: 6px 8px;
+}
+
+.theme-toggle-btn.compact .theme-label {
+  display: none;
+}
+
+/* DARK MODE GLOW */
+[data-theme="dark"] .theme-toggle-btn {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+  .theme-toggle-btn {
+    padding: 6px 8px;
+  }
+}
