@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import CarList from "./pages/CarList";
 import CarDetail from "./pages/CarDetail";
+import Booking from "./pages/Booking";
 
 import Payment from "./pages/Payment";
 import Profile from "./pages/Profile";
@@ -39,6 +40,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/cars" element={<CarList />} />
             <Route path="/cars/:id" element={<CarDetail />} />
+            <Route path="/booking/:id" element={<Booking />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />

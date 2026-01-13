@@ -2,15 +2,14 @@
 import { Link } from "react-router-dom";
 
 function Home() {
+  const scrollToFeatures = () => {
+    const el = document.getElementById("features");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
   return (
-    <div className="page" style={{ padding: "2rem 1.5rem" }}>
+    <div className="page container">
       <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1.5fr) minmax(0, 1fr)",
-          gap: "2rem",
-          alignItems: "center",
-        }}
+        className="hero"
       >
         {/* Left — Text */}
         <div>
@@ -46,9 +45,13 @@ function Home() {
               <button className="btn btn-primary">เริ่มจองรถตอนนี้</button>
             </Link>
 
-            <a href="#features">
-              <button className="btn btn-outline">ดูรายละเอียดบริการ</button>
-            </a>
+            <button
+              className="btn btn-outline"
+              onClick={scrollToFeatures}
+              aria-controls="features"
+            >
+              ดูรายละเอียดบริการ
+            </button>
           </div>
 
           <div
@@ -68,35 +71,10 @@ function Home() {
         </div>
 
         {/* Right — Highlight Car Box */}
-        <div
-          style={{
-            position: "relative",
-            height: "240px",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "radial-gradient(circle at 10% 10%, #ffd6a5, transparent 50%), radial-gradient(circle at 90% 90%, #ffd6f5, transparent 50%)",
-              borderRadius: "24px",
-            }}
-          />
+        <div className="highlight">
+          <div className="highlight-bg" />
 
-          <div
-            style={{
-              position: "absolute",
-              inset: "14px",
-              background: "var(--card)",
-              borderRadius: "20px",
-              padding: "1.1rem 1.2rem",
-              boxShadow: "0 18px 42px rgba(0,0,0,0.12)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className="highlight-card">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
               {/* Left Text */}
               <div>
@@ -173,7 +151,7 @@ function Home() {
             </div>
           </div>
 
-          <div style={{ position: "absolute", right: 18, top: 14, fontSize: 44 }}>🚗</div>
+          <div className="highlight-emoji">🚗</div>
         </div>
       </section>
 
@@ -198,25 +176,18 @@ function Home() {
           </p>
         </div>
 
-        <div
-          className="grid grid-2"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "1.2rem",
-          }}
-        >
-          <div className="card" style={styles.card}>
+        <div className="grid grid-2">
+          <div className="card">
             <h3>จองง่ายภายในไม่กี่ขั้นตอน</h3>
-            <p style={styles.textMuted}>
+            <p className="muted">
               เลือกวันที่ เลือกรถ กดยืนยัน ระบบจะบันทึกข้อมูลอัตโนมัติ
               สะดวกแม้ใช้ผ่านมือถือ
             </p>
           </div>
 
-          <div className="card" style={styles.card}>
+          <div className="card">
             <h3>รองรับมือถือ 100%</h3>
-            <p style={styles.textMuted}>
+            <p className="muted">
               หน้าเว็บเป็น responsive เต็มระบบ ใช้งานได้ดีในทุกขนาดหน้าจอ
             </p>
           </div>
@@ -229,14 +200,8 @@ function Home() {
           <h2 style={{ textAlign: "center" }}>รถแนะนำสำหรับคุณ</h2>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "1rem",
-          }}
-        >
-          <div style={{ ...styles.card, padding: "1rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+          <div className="card" style={{ padding: "1rem" }}>
             <div style={{ fontWeight: 800 }}>Honda City</div>
             <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Sedan · 5 ที่นั่ง · ออโต้</div>
             <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,350฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
@@ -245,7 +210,7 @@ function Home() {
             </div>
           </div>
 
-          <div style={{ ...styles.card, padding: "1rem" }}>
+          <div className="card" style={{ padding: "1rem" }}>
             <div style={{ fontWeight: 800 }}>Toyota Yaris</div>
             <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Eco car · 5 ที่นั่ง · ออโต้</div>
             <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,200฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
@@ -254,7 +219,7 @@ function Home() {
             </div>
           </div>
 
-          <div style={{ ...styles.card, padding: "1rem" }}>
+          <div className="card" style={{ padding: "1rem" }}>
             <div style={{ fontWeight: 800 }}>Mazda CX-3</div>
             <div style={{ color: "var(--text-muted)", marginTop: 6 }}>Crossover · 5 ที่นั่ง · ออโต้</div>
             <div style={{ marginTop: 10, fontWeight: 800, color: "var(--primary)" }}>1,700฿ <span style={{ fontWeight: 400, color: "var(--text-muted)", fontSize: "0.85rem" }}>/ วัน</span></div>
@@ -271,17 +236,3 @@ function Home() {
 }
 
 export default Home;
-
-const styles = {
-  card: {
-    background: "var(--card)",
-    padding: "1.2rem",
-    borderRadius: "10px",
-    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-  },
-  textMuted: {
-    color: "var(--text-muted)",
-    marginTop: "0.4rem",
-    lineHeight: "1.6",
-  },
-};

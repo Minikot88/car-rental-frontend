@@ -1,5 +1,6 @@
 // src/components/CarCard.jsx
 import { Link } from "react-router-dom";
+import { contact } from "../data/cars";
 
 export default function CarCard({ car }) {
   const image = car.image || "/assets/placeholder-car.jpg";
@@ -8,7 +9,7 @@ export default function CarCard({ car }) {
     <div style={styles.card}>
       <Link to={`/cars/${car.id || ""}`} style={styles.link}>
         <div style={styles.imageWrap}>
-          <img src={image} alt={car.name} style={styles.image} />
+          <img src={image} alt={car.name} style={styles.image} loading="lazy" />
           <div style={styles.badge}>
             <div style={styles.badgePrice}>฿{car.price.toLocaleString()}</div>
             <div style={styles.badgeUnit}>/ วัน</div>
@@ -21,10 +22,24 @@ export default function CarCard({ car }) {
             <span style={styles.metaItem}>🚗 {car.type || "ไม่ระบุ"}</span>
             <span style={styles.metaItem}>👥 {car.seats || 5}</span>
           </div>
+
+          <div style={styles.tagRow}>
+            {(car.tags || []).slice(0, 2).map((t, i) => (
+              <span key={i} style={styles.tag}>{t}</span>
+            ))}
+          </div>
         </div>
       </Link>
 
-      <button style={styles.button}>เลือกเช่า</button>
+      <div style={styles.actions}>
+        <a href={contact.line} target="_blank" rel="noreferrer" style={styles.contactLink}>
+          ติดต่อ Line
+        </a>
+
+        <Link to={`/cars/${car.id}`} style={styles.selectButton}>
+          เลือกเช่า
+        </Link>
+      </div>
     </div>
   );
 }
@@ -69,6 +84,31 @@ const styles = {
     marginTop: 10,
     fontWeight: 700,
   },
+  actions: {
+    display: "flex",
+    gap: 8,
+    marginTop: 8,
+  },
+  contactLink: {
+    padding: "8px 10px",
+    background: "transparent",
+    border: "1px solid var(--primary)",
+    color: "var(--primary)",
+    borderRadius: 8,
+    textDecoration: "none",
+    fontWeight: 600,
+  },
+  selectButton: {
+    padding: "8px 10px",
+    backgroundColor: "var(--primary)",
+    color: "#fff",
+    borderRadius: 8,
+    textDecoration: "none",
+    fontWeight: 700,
+    marginLeft: "auto",
+  },
+  tagRow: { marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" },
+  tag: { fontSize: 12, color: "var(--text-muted)", background: "rgba(0,0,0,0.03)", padding: "4px 8px", borderRadius: 8 },
   link: {
     color: "inherit",
     textDecoration: "none",

@@ -1,7 +1,7 @@
 // src/pages/CarList.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { carData } from "../data/cars";
+import { carData, contact } from "../data/cars";
 
 export default function CarList() {
   const [keyword, setKeyword] = useState("");
@@ -34,7 +34,7 @@ export default function CarList() {
       <div style={styles.list}>
         {filteredCars.map((car) => (
           <div key={car.id} style={styles.card}>
-            <img src={car.img} alt={car.name} style={styles.image} />
+            <img src={car.img || car.image} alt={car.name} style={styles.image} loading="lazy" />
 
             <div style={styles.body}>
               <h3 style={styles.title}>{car.name}</h3>
@@ -48,9 +48,9 @@ export default function CarList() {
                   ฿{car.price.toLocaleString()}/วัน
                 </span>
 
-                <Link to={`/cars/${car.id}`} style={styles.button}>
-                  ดูรายละเอียด
-                </Link>
+                <a href={contact.line} target="_blank" rel="noreferrer" style={styles.button}>
+                  ติดต่อเรา
+                </a>
               </div>
             </div>
           </div>

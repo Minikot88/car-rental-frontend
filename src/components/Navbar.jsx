@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const styles = {
     nav: {
       width: "100%",
@@ -127,13 +128,13 @@ export default function Navbar() {
   }, [theme]);
 
   return (
-    <nav style={styles.nav}>
+    <nav style={styles.nav} className="navbar" data-open={mobileOpen}>
       <div style={styles.content}>
         <div style={styles.left}>
         <span style={styles.logoIcon}>🚗</span>
         <span style={styles.logoText}>CarRental</span>
 
-        <div style={styles.searchWrap}>
+        <div style={styles.searchWrap} className="nav-search">
           <span style={styles.searchIcon}>🔍</span>
           <input
             aria-label="ค้นหารถ"
@@ -183,18 +184,45 @@ export default function Navbar() {
         </div>
         </div>
 
-        <div style={styles.actions}>
-        <Link to="/login" style={styles.authPrimary}>
-          เข้าสู่ระบบ
-        </Link>
-
-        <Link to="/register" style={styles.authGhost}>
-          สมัครสมาชิก
-        </Link>
-
-        <button aria-label="Toggle theme" onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} title="Toggle dark / light" style={{ marginLeft: 8, background: "transparent", border: "none", color: "inherit", fontSize: 18, cursor: "pointer", padding: 6, borderRadius: 8, }}>
-          {theme === "dark" ? "☀️" : "🌙"}
+        <button
+          className="mobile-toggle"
+          aria-label="Open menu"
+          onClick={() => setMobileOpen((s) => !s)}
+          style={{ display: "none", background: "transparent", border: "none", color: "inherit", fontSize: 22, cursor: "pointer", padding: 8 }}
+        >
+          ☰
         </button>
+
+        <div style={styles.actions} className="nav-actions">
+          <ul className="nav-list" style={{ display: "flex", gap: 12, listStyle: "none", margin: 0, padding: 0, alignItems: "center" }}>
+            <li>
+              <Link to="/login" style={styles.authPrimary} className="auth-primary">
+                เข้าสู่ระบบ
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/register" style={styles.authGhost} className="auth-ghost">
+                สมัครสมาชิก
+              </Link>
+            </li>
+          </ul>
+
+          <button aria-label="Toggle theme" onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))} title="Toggle dark / light" style={{ marginLeft: 8, background: "transparent", border: "none", color: "inherit", fontSize: 18, cursor: "pointer", padding: 6, borderRadius: 8, }}>
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+        </div>
+      </div>
+
+      <div className={`mobile-menu ${mobileOpen ? "open" : ""}`}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <input aria-label="ค้นหารถ" placeholder="ค้นหารถ, รุ่น หรือพื้นที่" style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #eee" }} value={query} onChange={(e) => setQuery(e.target.value)} />
+          <button onClick={() => { const q = encodeURIComponent(query || ""); const parts = []; if (from) parts.push(`from=${from}`); if (to) parts.push(`to=${to}`); if (q) parts.push(`q=${q}`); navigate(`/cars?${parts.join("&")}`); setMobileOpen(false); }} style={{ padding: "8px 10px", background: "var(--primary)", color: "#fff", border: "none", borderRadius: 8 }}>ค้นหา</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <Link to="/login" style={{ padding: "8px 10px", background: "var(--primary)", color: "#fff", borderRadius: 8, textAlign: "center" }} onClick={() => setMobileOpen(false)}>เข้าสู่ระบบ</Link>
+          <Link to="/register" style={{ padding: "8px 10px", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 8, textAlign: "center" }} onClick={() => setMobileOpen(false)}>สมัครสมาชิก</Link>
         </div>
       </div>
     </nav>
