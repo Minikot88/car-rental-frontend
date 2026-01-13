@@ -16,6 +16,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CarSearch from "./pages/CarSearch";
 
+
+
 function App() {
   const [open, setOpen] = useState(true);
 
