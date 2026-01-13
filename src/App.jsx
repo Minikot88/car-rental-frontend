@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import SubNav from "./components/SubNav";
@@ -10,24 +10,20 @@ import CarList from "./pages/CarList";
 import CarDetail from "./pages/CarDetail";
 import Booking from "./pages/Booking";
 
-import Payment from "./pages/Payment";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CarSearch from "./pages/CarSearch";
 
 function App() {
-  // Sidebar removed; using pinned SubNav under Navbar
-
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
-
       <SubNav />
+
       <div
         className="content"
         style={{
-          marginLeft: 0,
           marginTop: "120px",
           padding: "24px",
           display: "flex",
@@ -41,7 +37,7 @@ function App() {
             <Route path="/cars" element={<CarList />} />
             <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/booking/:id" element={<Booking />} />
-            <Route path="/payment" element={<Payment />} />
+ 
             <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -51,7 +47,7 @@ function App() {
 
         <Footer />
       </div>
-    </BrowserRouter>
+    </>
   );
 }
 

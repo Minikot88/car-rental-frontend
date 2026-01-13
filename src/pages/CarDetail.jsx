@@ -1,8 +1,8 @@
-// src/pages/CarDetail.jsx
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { carData } from "../data/cars";
+import "./styles/CarDetail.css";
 
 function CarDetail() {
   const { id } = useParams();
@@ -17,8 +17,7 @@ function CarDetail() {
         if (!cancelled) setCar(res.data);
       })
       .catch(() => {
-        // fallback to local data
-        const found = carData.find((c) => c.id === id);
+        const found = carData.find((c) => String(c.id) === String(id));
         if (!cancelled) setCar(found || null);
       });
 
@@ -27,49 +26,71 @@ function CarDetail() {
     };
   }, [id]);
 
-  if (!car) return <p>กำลังโหลดข้อมูล...</p>;
+  if (!car) {
+    return <p className="car-detail-loading">กำลังโหลดข้อมูล...</p>;
+  }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>{car.name}</h2>
-      <img src={car.image || car.img} style={{ width: 350, borderRadius: 10 }} alt={car.name} />
+    <div className="car-detail-page">
+      <div className="car-detail-card">
+        {/* IMAGE */}
+        <div className="car-detail-image-wrap">
+          {car.image || car.img ? (
+            <img
+              src={car.image || car.img}
+              alt={car.name}
+              loading="lazy"
+            />
+          ) : (
+            <div className="car-detail-image-placeholder">🚗</div>
+          )}
+        </div>
 
+        {/* INFO */}
+        <div className="car-detail-info">
+          <h1 className="car-detail-title">{car.name}</h1>
+
+          <p className="car-detail-meta">
+            ประเภทรถ: <strong>{car.type || "ไม่ระบุ"}</strong> •{" "}
+            {car.seats || 5} ที่นั่ง
+          </p>
+
+          <div className="car-detail-price">
+            ฿{car.price.toLocaleString()}
+            <span>/วัน</span>
+          </div>
+
+          <div className="car-detail-desc">
+            {car.description || "ไม่มีรายละเอียดเพิ่มเติม"}
+          </div>
+
+          <Link
+            to={`/booking/${car.id}`}
+            className="car-detail-book-btn"
+          >
+            จองรถคันนี้
+          </Link>
+        </div>
+      </div>
+
+      {/* SEO STRUCTURED DATA */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
           name: car.name,
-          image: [car.image || car.img],
-          description: car.description || `${car.type} รถเช่า`,
+          image: [car.image || car.img].filter(Boolean),
+          description: car.description || `${car.type || ""} รถเช่า`,
           offers: {
             "@type": "Offer",
             price: car.price,
             priceCurrency: "THB",
+            availability: "https://schema.org/InStock",
           },
         })}
       </script>
-
-      <p>ประเภทรถ: {car.type}</p>
-      <p>ราคา: {car.price} บาท/วัน</p>
-      <p>รายละเอียด: {car.description || "-"}</p>
-
-      <Link to={`/booking/${car.id}`} style={styles.button}>
-        จองรถคันนี้
-      </Link>
     </div>
   );
 }
 
 export default CarDetail;
-
-const styles = {
-  button: {
-    display: "inline-block",
-    marginTop: 20,
-    padding: "10px 15px",
-    background: "#007bff",
-    color: "#fff",
-    borderRadius: 5,
-    textDecoration: "none",
-  },
-};

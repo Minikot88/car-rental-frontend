@@ -1,0 +1,154 @@
+/* ================= FOOTER ================= */
+.footer {
+  padding: 0 0 20px;
+  color: var(--text);
+}
+
+/* CARD */
+.footer-card {
+  max-width: 1100px;
+  margin: 48px auto 16px;
+  padding: 22px;
+  border-radius: 18px;
+
+  backdrop-filter: blur(8px);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card) 85%, transparent),
+    color-mix(in srgb, var(--card) 65%, transparent)
+  );
+
+  box-shadow:
+    0 18px 40px rgba(2, 6, 23, 0.12),
+    0 6px 18px rgba(2, 6, 23, 0.08) inset;
+}
+
+/* GRID */
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+/* COLUMN */
+.footer-col {
+  min-width: 160px;
+}
+
+/* BRAND */
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.brand-icon {
+  font-size: 32px;
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.brand-tag {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* TEXT */
+.footer-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* TITLES */
+.footer-title {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* LIST */
+.footer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-list a {
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.footer-list a:hover {
+  color: var(--primary);
+}
+
+/* CONTACT */
+.footer-contact {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* SOCIAL */
+.social-row {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+
+  background: var(--card);
+  text-decoration: none;
+  font-size: 1.1rem;
+
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.social-icon:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* DIVIDER */
+.footer-divider {
+  width: 100%;
+  height: 1px;
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+  margin: 18px 0 14px;
+}
+
+/* COPYRIGHT */
+.footer-copy {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 640px) {
+  .footer-card {
+    margin: 32px 12px 12px;
+    padding: 18px;
+  }
+}
