@@ -1,73 +1,78 @@
 /* ================= SUB NAV ================= */
 .subnav {
-  position: fixed;
-  top: 64px; /* ใต้ Navbar */
-  left: 0;
-  right: 0;
-  height: 56px;
-  z-index: 900;
-
-  backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: var(--card);
   border-bottom: 1px solid var(--border);
 }
 
-/* CONTAINER */
 .subnav-container {
-  max-width: 1200px;
-  height: 100%;
+  max-width: var(--max-width);
   margin: auto;
-  padding: 0 18px;
+  padding: 0.75rem 1rem;
 
   display: flex;
+  justify-content: center;   /* ⭐ จัดกลาง */
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  gap: 0.75rem;
 
   overflow-x: auto;
+  scrollbar-width: none;
 }
 
-/* ITEM */
-.subnav-item {
-  padding: 10px 16px;
-  border-radius: 999px;
+.subnav-container::-webkit-scrollbar {
+  display: none;
+}
 
+/* ================= ITEM ================= */
+.subnav-item {
+  position: relative;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 0.9rem;
   white-space: nowrap;
 
-  color: var(--text);
-  background: transparent;
-
-  transition: all 0.2s ease;
+  color: var(--text-muted);
+  transition: all 0.25s ease;
 }
 
-/* HOVER */
 .subnav-item:hover {
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: var(--bg);
+  color: var(--text);
 }
 
-/* ACTIVE */
+/* ================= ACTIVE ================= */
 .subnav-item.active {
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-weight: 600;
+}
+
+/* เส้นใต้แบบหรู */
+.subnav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 3px;
+  border-radius: 999px;
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(255, 0, 0, 0.35);
+}
+
+/* ================= DARK MODE ================= */
+[data-theme="dark"] .subnav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width: 640px) {
-  .subnav {
-    height: 52px;
-  }
-
+@media (max-width: 600px) {
   .subnav-container {
-    justify-content: flex-start;
+    justify-content: flex-start; /* ⭐ mobile เลื่อนได้ */
   }
 
   .subnav-item {
-    padding: 8px 14px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    padding: 0.45rem 1rem;
   }
 }

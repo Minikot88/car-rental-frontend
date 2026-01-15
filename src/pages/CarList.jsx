@@ -11,64 +11,85 @@ export default function CarList() {
   );
 
   return (
-    <div className="carlist-page">
-      {/* 🔍 Search */}
-      <div className="carlist-search">
-        <input
-          type="text"
-          placeholder="ค้นหารุ่นรถ หรือ ประเภทรถ"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-        />
-        <button>ค้นหา</button>
-      </div>
+    <div className="carlist-layout">
+      {/* ========== MAIN ========== */}
+      <main className="carlist-page">
+        {/* Search */}
+        <div className="carlist-search">
+          <input
+            type="text"
+            placeholder="ค้นหารุ่นรถ หรือ ประเภทรถ"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+          <button>ค้นหา</button>
+        </div>
 
-      {/* Result */}
-      <p className="carlist-result">
-        พบ {filteredCars.length} รายการ
-      </p>
+        <p className="carlist-result">
+          พบ {filteredCars.length} รายการ
+        </p>
 
-      {/* Grid */}
-      <div className="carlist-grid">
-        {filteredCars.map((car) => (
-          <div key={car.id} className="carlist-card">
-            {/* IMAGE SLOT (FIX HEIGHT) */}
-            <div className="carlist-image-wrap">
-              {car.img || car.image ? (
-                <img
-                  src={car.img || car.image}
-                  alt={car.name}
-                  loading="lazy"
-                />
-              ) : (
-                <div className="carlist-image-placeholder">🚗</div>
-              )}
-            </div>
+        <div className="carlist-grid">
+          {filteredCars.map((car, i) => (
+            <div key={car.id} className="carlist-card">
+              {/* IMAGE */}
+              <div className="carlist-image-wrap">
+                <img src={car.image} alt={car.name} />
+              </div>
 
-            {/* BODY */}
-            <div className="carlist-body">
-              <h3>{car.name}</h3>
+              {/* INFO */}
+              <div className="carlist-info-wrap">
+                <h3 className="car-name">{car.name}</h3>
 
-              <p className="carlist-info">
-                ประเภท: {car.type || "ไม่ระบุ"} • {car.seats || 5} ที่นั่ง
-              </p>
+                {/* ⭐ Rating */}
+                <div className="car-rating">
+                  ⭐ 4.{(i % 5) + 3} ( {20 + i * 3} รีวิว )
+                </div>
 
-              <div className="carlist-footer">
-                <span className="carlist-price">
-                  ฿{car.price.toLocaleString()}/วัน
-                </span>
+                <div className="car-meta">
+                  <span>🚘 {car.type}</span>
+                  <span>👥 {car.seats} ที่นั่ง</span>
+                  <span>⚙️ {car.transmission}</span>
+                </div>
+
+                {/* 📍 Pickup */}
+                <div className="car-pickup">
+                  📍 รับรถ: สนามบิน / สำนักงาน
+                </div>
+
+                {/* 🟢 Availability */}
+                <div className="car-availability">
+                  {i % 4 === 0 ? (
+                    <span className="danger">❗ เหลือ 1 คัน</span>
+                  ) : (
+                    <span className="success">🟢 รถว่าง</span>
+                  )}
+                </div>
+
+                {/* ❌ Policy */}
+                <div className="car-policy">
+                  ❌ ยกเลิกฟรีภายใน 24 ชม.
+                </div>
+              </div>
+
+              {/* PRICE */}
+              <div className="carlist-price-wrap">
+                <div className="price-label">ราคา / วัน</div>
+                <div className="car-price">
+                  ฿{car.price.toLocaleString()}
+                </div>
 
                 <Link
-                  to={`/cars/${car.id}`}
+                  to={`/carsdetail/${car.id}`}
                   className="carlist-detail-btn"
                 >
-                  รายละเอียด
+                  ดูรายละเอียด
                 </Link>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

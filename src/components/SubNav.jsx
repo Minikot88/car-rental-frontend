@@ -14,8 +14,8 @@ export default function SubNav() {
         </Link>
 
         <Link
-          to="/cars"
-          className={`subnav-item ${isActive("/cars") ? "active" : ""}`}
+          to="/carslist"
+          className={`subnav-item ${isActive("/carslist") ? "active" : ""}`}
         >
           รถทั้งหมด
         </Link>

@@ -1,60 +1,63 @@
-import { useState, useEffect } from "react";
-import api from "../services/api";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./styles/Login.css";
 
 function Login() {
-  const nav = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [animate, setAnimate] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
-  useEffect(() => {
-    const t = setTimeout(() => setAnimate(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const submit = () => {
-    api.post("/auth/login", form).then(() => {
-      nav("/");
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("LOGIN DATA:", form);
   };
 
   return (
     <div className="auth-page">
-      <div className={`auth-card ${animate ? "show" : ""}`}>
+      {/* ใส่ show ตรงนี้เลย */}
+      <div className="auth-card show">
         <h2 className="auth-title">เข้าสู่ระบบ</h2>
 
-        {/* Email */}
-        <div className="input-group">
-          <span className="input-icon">📧</span>
-          <input
-            name="email"
-            placeholder="Email"
-            onChange={handleChange}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <span className="input-icon">📧</span>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {/* Password */}
-        <div className="input-group">
-          <span className="input-icon">🔒</span>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-          />
-        </div>
+          <div className="input-group">
+            <span className="input-icon">🔒</span>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button className="auth-button" onClick={submit}>
-          เข้าสู่ระบบ
-        </button>
+          <button type="submit" className="auth-button">
+            เข้าสู่ระบบ
+          </button>
+        </form>
 
         <p className="auth-note">
-          ยังไม่มีบัญชี?{" "}
-          <Link to="/register">สมัครสมาชิก</Link>
+          ยังไม่มีบัญชี? <Link to="/register">สมัครสมาชิก</Link>
         </p>
       </div>
     </div>
