@@ -9,11 +9,18 @@ import Home from "./pages/Home";
 import CarList from "./pages/CarList";
 import CarDetail from "./pages/CarDetail";
 import Booking from "./pages/Booking";
-import SearchPage from "./pages/SearchPage"; 
+import SearchPage from "./pages/SearchPage";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Payment from "./pages/Payment";
+
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCars from "./pages/admin/AdminCars";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 function App() {
   return (
@@ -36,17 +43,28 @@ function App() {
             <Route path="/carslist" element={<CarList />} />
             <Route path="/carsdetail/:id" element={<CarDetail />} />
             <Route path="/booking/:id" element={<Booking />} />
-
-            <Route path="/search" element={<SearchPage />} /> {/* ✅ แก้ตรงนี้ */}
-
+            <Route path="/search" element={<SearchPage />} /> 
             <Route path="/payment" element={<Payment />} />
-         
+
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-          </Routes>
-        </div>
 
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="cars" element={<AdminCars />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+
+          </Routes>
+
+
+
+        </div>
         <Footer />
+
+
       </div>
     </>
   );
