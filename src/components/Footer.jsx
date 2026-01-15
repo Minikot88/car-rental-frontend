@@ -1,36 +1,59 @@
-// src/components/Footer.jsx
+import React from "react";
+import "./styles/Footer.css";
+
 function Footer() {
   return (
-    <footer style={styles.footer}>
-      <div style={styles.divider}></div>
+    <footer className="footer">
+      <div className="footer-card">
+        <div className="footer-container">
+          {/* BRAND */}
+          <div className="footer-col">
+            <div className="brand-row">
+              <span className="brand-icon">🚗</span>
+              <div>
+                <div className="brand-name">CarRental</div>
+                <div className="brand-tag">เช่ารถง่าย ทุกทริป</div>
+              </div>
+            </div>
 
-      <p style={styles.text}>
-        © {new Date().getFullYear()} CarRental • All Rights Reserved
-      </p>
+            <p className="footer-desc">
+              บริการเช่ารถออนไลน์ ครอบคลุมทุกจังหวัด
+              พร้อมตัวเลือกประกันและบริการรับ-ส่ง
+            </p>
+          </div>
+
+          {/* LINKS */}
+          <div className="footer-col">
+            <div className="footer-title">ลิงก์ด่วน</div>
+            <ul className="footer-list">
+              <li><a href="/cars">รถทั้งหมด</a></li>
+              <li><a href="/booking/1">จองรถ</a></li>
+              <li><a href="/profile">บัญชีของฉัน</a></li>
+            </ul>
+          </div>
+
+          {/* CONTACT */}
+          <div className="footer-col">
+            <div className="footer-title">ติดต่อ</div>
+            <div className="footer-contact">support@carrental.example</div>
+            <div className="footer-contact">โทร: 02-123-4567</div>
+
+            <div className="social-row">
+              <a href="#" className="social-icon">🌐</a>
+              <a href="#" className="social-icon">📘</a>
+              <a href="#" className="social-icon">📸</a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-divider" />
+
+        <p className="footer-copy">
+          © {new Date().getFullYear()} CarRental • All Rights Reserved
+        </p>
+      </div>
     </footer>
   );
 }
 
 export default Footer;
-
-const styles = {
-  footer: {
-    marginTop: 40,
-    padding: "20px 10px",
-    textAlign: "center",
-  },
-
-  divider: {
-    width: "100%",
-    height: "1px",
-    backgroundColor: "#e5e5e5", // เส้นสีเทาอ่อนแบบมินิมอล
-    marginBottom: 15,
-  },
-
-  text: {
-    color: "#777",          // เทาเรียบหรู
-    fontSize: "14px",
-    fontWeight: 400,
-    letterSpacing: "0.3px",
-  },
-};
