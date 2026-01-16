@@ -1,14 +1,17 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { carData } from "../data/cars";
+import { useEffect } from "react";
 import "./styles/CarDetail.css";
 
 function CarDetail() {
   const { id } = useParams();
-  const [car, setCar] = useState(null);
+
+  /* ================= FIND CAR (DERIVED DATA) ================= */
+  const car = carData.find(
+    (c) => String(c.id) === String(id)
+  );
 
   /* ================= MOCK AVAILABILITY ================= */
-  // YYYY-MM-DD
   const unavailableDates = [
     "2026-01-20",
     "2026-01-21",
@@ -16,28 +19,9 @@ function CarDetail() {
     "2026-01-28",
   ];
 
-  useEffect(() => {
-    let cancelled = false;
-
-    carData
-      .get(`/cars/${id}`)
-      .then((res) => {
-        if (!cancelled) setCar(res.data);
-      })
-      .catch(() => {
-        const found = carData.find((c) => String(c.id) === String(id));
-        if (!cancelled) setCar(found || null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  /* ================= SCROLL ANIMATION (SAFE) ================= */
+  /* ================= SCROLL ANIMATION ================= */
   useEffect(() => {
     const els = document.querySelectorAll(".reveal");
-    els.forEach((el) => el.classList.add("show")); // fallback แสดงก่อน
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -52,8 +36,13 @@ function CarDetail() {
     return () => io.disconnect();
   }, []);
 
+  /* ================= NOT FOUND ================= */
   if (!car) {
-    return <p className="car-detail-loading">กำลังโหลดข้อมูล...</p>;
+    return (
+      <div className="car-detail-loading">
+        ❌ ไม่พบข้อมูลรถ
+      </div>
+    );
   }
 
   /* mock เดือน/วันนี้ */
@@ -66,7 +55,7 @@ function CarDetail() {
       <div className="car-detail-hero reveal">
         {/* IMAGE */}
         <div className="car-detail-image-wrap">
-          <img src={car.image || car.img} alt={car.name} />
+          <img src={car.image} alt={car.name} />
         </div>
 
         {/* INFO */}
@@ -74,14 +63,15 @@ function CarDetail() {
           <h1 className="car-detail-title">{car.name}</h1>
 
           <div className="car-detail-rating">
-            ⭐ 4.7 <span>(128 รีวิว)</span>
+            ⭐ {car.ratings?.score ?? 4.5}
+            <span>({car.ratings?.reviews ?? 0} รีวิว)</span>
             <span className="badge success">พร้อมใช้งาน</span>
           </div>
 
           <div className="car-detail-meta">
             <span>🚘 {car.type}</span>
             <span>👥 {car.seats} ที่นั่ง</span>
-            <span>⚙️ {car.transmission || "Auto"}</span>
+            <span>⚙️ {car.transmission}</span>
           </div>
 
           <div className="car-detail-price pop">
@@ -96,9 +86,6 @@ function CarDetail() {
             <li>✔ ไม่มีค่าธรรมเนียมแอบแฝง</li>
           </ul>
 
-          <Link to={`/booking/${car.id}`} className="car-detail-book-btn">
-            จองรถคันนี้
-          </Link>
         </div>
       </div>
 
@@ -117,15 +104,15 @@ function CarDetail() {
           </div>
           <div>
             <strong>ระบบเกียร์</strong>
-            <span>{car.transmission || "Auto"}</span>
+            <span>{car.transmission}</span>
           </div>
           <div>
-            <strong>จุดรับรถ</strong>
-            <span>สนามบิน / สำนักงาน</span>
+            <strong>เชื้อเพลิง</strong>
+            <span>{car.fuel}</span>
           </div>
           <div>
-            <strong>นโยบายยกเลิก</strong>
-            <span>ยกเลิกฟรี 24 ชม.</span>
+            <strong>ปีรถ</strong>
+            <span>{car.year}</span>
           </div>
           <div>
             <strong>สถานะ</strong>
@@ -166,7 +153,7 @@ function CarDetail() {
         </div>
 
         <p className="availability-note muted">
-          * ข้อมูลนี้เป็นตัวอย่าง (mockup) ระบบจริงจะอัปเดตจากการจองแบบเรียลไทม์
+          * ข้อมูลนี้เป็น mockup ระบบจริงจะอัปเดตจากการจอง
         </p>
       </section>
     </div>
