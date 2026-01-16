@@ -28,8 +28,8 @@ export default function SubNav() {
         </Link>
 
         <Link
-          to="/profile"
-          className={`subnav-item ${isActive("/profile") ? "active" : ""}`}
+          to="/admin"
+          className={`subnav-item ${isActive("/admin") ? "active" : ""}`}
         >
           โปรไฟล์
         </Link>
