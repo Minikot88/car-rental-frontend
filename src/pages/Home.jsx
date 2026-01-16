@@ -25,7 +25,7 @@ function Home() {
           </p>
 
           <div className="hero-actions">
-            <Link to="/carslist">
+            <Link to="/cars">
               <button className="btn btn-primary">เริ่มจองรถ</button>
             </Link>
 

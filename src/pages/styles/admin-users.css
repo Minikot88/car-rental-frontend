@@ -270,3 +270,33 @@
     width: 100%;
   }
 }
+
+
+/* ===== USER DETAIL ===== */
+.user-detail-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 520px;
+}
+
+.user-detail-card .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.user-detail-card .row:last-child {
+  border-bottom: none;
+}
+
+.back-btn {
+  margin-bottom: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+}

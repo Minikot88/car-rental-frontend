@@ -1,9 +1,3 @@
-:root {
-  --primary: #ff0000;
-  --primary-dark: #cc0000;
-  --primary-soft: #ffe5e5;
-}
-
 /* ================= PAGE ================= */
 .payment-page {
   max-width: 520px;

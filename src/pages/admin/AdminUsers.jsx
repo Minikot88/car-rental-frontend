@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "../styles/admin-users.css";
 
 /* ===== MOCK USERS ===== */
@@ -27,9 +29,11 @@ const mockUsers = [
 ];
 
 export default function AdminUsers() {
+
   const [users, setUsers] = useState(mockUsers);
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate();
 
   /* ===== SEARCH ===== */
   const filteredUsers = users.filter((u) =>
@@ -44,9 +48,9 @@ export default function AdminUsers() {
       prev.map((u) =>
         u.id === selectedUser.id
           ? {
-              ...u,
-              status: u.status === "active" ? "blocked" : "active",
-            }
+            ...u,
+            status: u.status === "active" ? "blocked" : "active",
+          }
           : u
       )
     );
@@ -110,11 +114,10 @@ export default function AdminUsers() {
                   </td>
                   <td>
                     <span
-                      className={`badge ${
-                        u.status === "active"
+                      className={`badge ${u.status === "active"
                           ? "success"
                           : "danger"
-                      }`}
+                        }`}
                     >
                       {u.status}
                     </span>
@@ -150,7 +153,14 @@ export default function AdminUsers() {
             </p>
 
             <div className="dialog-actions">
-              <button>📄 รายละเอียดผู้ใช้</button>
+              <button
+                onClick={() => {
+                  navigate(`/admin/users/${selectedUser.id}`);
+                  setSelectedUser(null);
+                }}
+              >
+                📄 รายละเอียดผู้ใช้
+              </button>
 
               <button onClick={toggleStatus}>
                 ⚙️{" "}
@@ -159,9 +169,25 @@ export default function AdminUsers() {
                   : "เปิดใช้งาน"}
               </button>
 
-              <button>✏️ แก้ไขข้อมูล</button>
+              <button
+  onClick={() => {
+    navigate(`/admin/users/${selectedUser.id}/edit`);
+    setSelectedUser(null);
+  }}
+>
+  ✏️ แก้ไขข้อมูล
+</button>
 
-              <button>📚 ประวัติการจอง</button>
+
+   <button
+  onClick={() => {
+    navigate(`/admin/users/${selectedUser.id}/bookings`);
+    setSelectedUser(null);
+  }}
+>
+  📚 ประวัติการจอง
+</button>
+
 
               <button
                 className="danger"

@@ -1,31 +1,26 @@
 /* ==================================================
-   ADMIN DATA TABLE – SAAS (DARK / LIGHT)
+   ADMIN DATA TABLE – PRODUCTION (LIGHT / DARK)
 ================================================== */
 
-/* ==================================================
-   WRAPPER
-================================================== */
+/* ================= WRAPPER ================= */
 .data-table-wrapper {
   background: var(--card);
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
   overflow-x: auto;
 }
 
-/* ==================================================
-   TABLE
-================================================== */
+/* ================= TABLE ================= */
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   min-width: 640px;
 }
 
-/* ==================================================
-   HEADER
-================================================== */
-.data-table th {
+/* ================= HEADER ================= */
+.data-table thead th {
   background: var(--bg);
   color: var(--text-muted);
   text-align: left;
@@ -40,30 +35,27 @@
   text-align: right;
 }
 
-/* ==================================================
-   BODY
-================================================== */
-.data-table td {
+/* ================= BODY ================= */
+.data-table tbody td {
   padding: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-soft);
   font-size: 14px;
   color: var(--text);
   vertical-align: middle;
-  transition: background 0.15s ease;
 }
 
-/* Hover row */
-.row-hover:hover td {
-  background: linear-gradient(
-    90deg,
-    var(--primary-soft),
-    transparent
-  );
+/* ================= ROW HOVER (SAFE) ================= */
+.row-hover {
+  transition: background 0.2s ease,
+              box-shadow 0.2s ease;
 }
 
-/* ==================================================
-   ACTIONS
-================================================== */
+.row-hover:hover {
+  background: var(--row-hover);
+  box-shadow: inset 4px 0 0 var(--primary);
+}
+
+/* ================= ACTIONS ================= */
 .data-table .actions {
   text-align: right;
   white-space: nowrap;
@@ -75,19 +67,22 @@
   border: 1px solid var(--border);
   background: var(--card);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   margin-left: 6px;
   color: var(--text);
   transition: background 0.15s ease,
-              border 0.15s ease;
+              border-color 0.15s ease,
+              transform 0.15s ease;
 }
 
 .data-table .actions button:hover {
-  background: var(--primary-soft);
+  background: var(--bg-soft);
   border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
-/* Action variants (optional) */
+/* Action variants */
 .data-table .actions .edit {
   color: #3b82f6;
 }
@@ -96,26 +91,20 @@
   color: #ef4444;
 }
 
-/* ==================================================
-   EMPTY STATE
-================================================== */
+/* ================= EMPTY STATE ================= */
 .data-table .empty {
   text-align: center;
-  padding: 36px;
+  padding: 40px;
   color: var(--text-muted);
   font-size: 14px;
 }
 
-/* ==================================================
-   DARK MODE TUNING
-================================================== */
+/* ================= DARK MODE TUNING ================= */
 [data-theme="dark"] .data-table-wrapper {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-lg);
 }
 
-/* ==================================================
-   RESPONSIVE
-================================================== */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 640px) {
   .data-table {
     min-width: 520px;

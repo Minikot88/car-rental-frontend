@@ -21,6 +21,11 @@ import AdminCars from "./pages/admin/AdminCars";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminUserDetail from "./pages/admin/AdminUserDetail";
+
+import AdminUserEdit from "./pages/admin/AdminUserEdit";
+import AdminUserBookings from "./pages/admin/AdminUserBookings";
+
 
 function App() {
   return (
@@ -43,7 +48,7 @@ function App() {
             <Route path="/carslist" element={<CarList />} />
             <Route path="/carsdetail/:id" element={<CarDetail />} />
             <Route path="/booking/:id" element={<Booking />} />
-            <Route path="/search" element={<SearchPage />} /> 
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/payment" element={<Payment />} />
 
             <Route path="/login" element={<Login />} />
@@ -54,6 +59,11 @@ function App() {
               <Route path="cars" element={<AdminCars />} />
               <Route path="bookings" element={<AdminBookings />} />
               <Route path="users" element={<AdminUsers />} />
+
+              <Route path="users/:id" element={<AdminUserDetail />} />
+              <Route path="users/:id/edit" element={<AdminUserEdit />} />
+              <Route path="users/:id/bookings" element={<AdminUserBookings />} />
+              
               <Route path="settings" element={<AdminSettings />} />
             </Route>
 
