@@ -31,7 +31,7 @@ export default function SubNav() {
           to="/admin"
           className={`subnav-item ${isActive("/admin") ? "active" : ""}`}
         >
-          โปรไฟล์
+          admin-page
         </Link>
       </div>
     </div>
