@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { carData } from "../data/cars";
 import { isCarAvailable } from "../utils/availability";
 import CarSearch from "../components/CarSearch";
-import "./styles/Cars.css";
+import "./styles/cars.css";
 
 export default function SearchPage() {
   const [cars, setCars] = useState([]);
