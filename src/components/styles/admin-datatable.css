@@ -1,0 +1,123 @@
+/* ==================================================
+   ADMIN DATA TABLE – SAAS (DARK / LIGHT)
+================================================== */
+
+/* ==================================================
+   WRAPPER
+================================================== */
+.data-table-wrapper {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+/* ==================================================
+   TABLE
+================================================== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+/* ==================================================
+   HEADER
+================================================== */
+.data-table th {
+  background: var(--bg);
+  color: var(--text-muted);
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.th-actions {
+  text-align: right;
+}
+
+/* ==================================================
+   BODY
+================================================== */
+.data-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
+  vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+/* Hover row */
+.row-hover:hover td {
+  background: linear-gradient(
+    90deg,
+    var(--primary-soft),
+    transparent
+  );
+}
+
+/* ==================================================
+   ACTIONS
+================================================== */
+.data-table .actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table .actions button {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 6px;
+  color: var(--text);
+  transition: background 0.15s ease,
+              border 0.15s ease;
+}
+
+.data-table .actions button:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+/* Action variants (optional) */
+.data-table .actions .edit {
+  color: #3b82f6;
+}
+
+.data-table .actions .delete {
+  color: #ef4444;
+}
+
+/* ==================================================
+   EMPTY STATE
+================================================== */
+.data-table .empty {
+  text-align: center;
+  padding: 36px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ==================================================
+   DARK MODE TUNING
+================================================== */
+[data-theme="dark"] .data-table-wrapper {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+@media (max-width: 640px) {
+  .data-table {
+    min-width: 520px;
+  }
+}

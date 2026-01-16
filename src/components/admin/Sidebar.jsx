@@ -1,16 +1,20 @@
-// src/components/admin/Sidebar.jsx
 import { NavLink } from "react-router-dom";
+import "../styles/admin-sidebar.css";
 
 export default function Sidebar() {
   return (
     <aside className="admin-sidebar">
-      <h2>ADMIN</h2>
+      <h2 className="admin-logo">ADMIN</h2>
 
-      <NavLink to="/admin">Dashboard</NavLink>
-      <NavLink to="/admin/cars">รถ</NavLink>
-      <NavLink to="/admin/bookings">การจอง</NavLink>
-      <NavLink to="/admin/users">ผู้ใช้</NavLink>
-      <NavLink to="/admin/settings">ตั้งค่า</NavLink>
+      <nav className="admin-menu">
+        <NavLink to="/admin" end>
+          Dashboard
+        </NavLink>
+        <NavLink to="/admin/cars">รถ</NavLink>
+        <NavLink to="/admin/bookings">การจอง</NavLink>
+        <NavLink to="/admin/users">ผู้ใช้</NavLink>
+        <NavLink to="/admin/settings">ตั้งค่า</NavLink>
+      </nav>
     </aside>
   );
 }

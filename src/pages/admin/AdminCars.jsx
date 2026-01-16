@@ -1,41 +1,48 @@
-// src/pages/admin/AdminCars.jsx
 import { useState } from "react";
-import { carData as mockCars } from "../../data/cars";
+import DataTable from "../../components/admin/DataTable";
+import Modal from "../../components/admin/Modal";
+import { carData } from "../../data/cars";
 
 export default function AdminCars() {
-  const [cars, setCars] = useState(mockCars);
+  const [cars, setCars] = useState(carData);
+  const [deleteCar, setDeleteCar] = useState(null);
 
-  const deleteCar = (id) => {
-    setCars(cars.filter((c) => c.id !== id));
-  };
+  const columns = [
+    { key: "name", label: "ชื่อรถ" },
+    { key: "price", label: "ราคา", render: (c) => `฿${c.price}` },
+  ];
 
   return (
     <>
       <h1>จัดการรถ</h1>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>ชื่อรถ</th>
-            <th>ราคา</th>
-            <th>จัดการ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cars.map((car) => (
-            <tr key={car.id}>
-              <td>{car.name}</td>
-              <td>฿{car.price}</td>
-              <td>
-                <button>แก้ไข</button>
-                <button onClick={() => deleteCar(car.id)}>
-                  ลบ
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <DataTable
+        columns={columns}
+        data={cars}
+        renderActions={(car) => (
+          <>
+            <button className="edit">แก้ไข</button>
+            <button
+              className="delete"
+              onClick={() => setDeleteCar(car)}
+            >
+              ลบ
+            </button>
+          </>
+        )}
+      />
+
+      <Modal
+        open={!!deleteCar}
+        title="ยืนยันการลบรถ"
+        onClose={() => setDeleteCar(null)}
+        onConfirm={() => {
+          setCars(cars.filter((c) => c.id !== deleteCar.id));
+          setDeleteCar(null);
+        }}
+      >
+        ต้องการลบรถ <b>{deleteCar?.name}</b> ใช่หรือไม่?
+      </Modal>
     </>
   );
 }
