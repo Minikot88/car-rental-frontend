@@ -1,78 +1,61 @@
 /* =========================================================
-   GLOBAL DESIGN SYSTEM (PRODUCTION – NEUTRAL SAFE)
+   GLOBAL DESIGN SYSTEM — PREMIUM MINIMAL RED (FIXED)
+   No White Text Bug on Light Mode
    ========================================================= */
 
-/* ================= THEME TOKENS ================= */
-
-/* ---------- LIGHT MODE ---------- */
+/* ================= THEME ================= */
 :root {
-  /* ===== BRAND ===== */
-  --primary: #ff0000;
-  --primary-hover: #e60000;
 
-  /* ❗ เปลี่ยนเป็น neutral (ไม่แดง) */
-  --primary-soft: rgba(0, 0, 0, 0.04);
+  /* 🔴 Primary */
+  --primary: #e10600;
+  --primary-light: #ff2a2a;
+  --primary-soft: rgba(225, 6, 0, 0.08);
 
-  /* ===== BACKGROUND ===== */
-  --bg: #f6f7f9;
-  --bg-soft: #fbfbfc;
+  /* Background */
+  --bg: #f4f5f7;
+  --bg-soft: #f9fafb;
   --card: #ffffff;
 
-  /* ===== ROW / LIST ===== */
-  --row-hover: rgba(0, 0, 0, 0.025);
-
-  /* ===== TEXT ===== */
-  --text: #111827;
+  /* Text */
+  --text: #111111;
   --text-muted: #6b7280;
+
+  /* Invert (ใช้เฉพาะ dark mode จริง ๆ) */
   --text-invert: #ffffff;
 
-  /* ===== BORDER ===== */
-  --border: #e5e7eb;
-  --border-soft: #f1f3f6;
+  /* Border */
+  --border: #e6e6e6;
 
-  /* ===== SHADOW ===== */
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
-
-  /* ===== RADIUS ===== */
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;
   --radius-lg: 20px;
+  --radius-xl: 26px;
 
-  /* ===== LAYOUT ===== */
-  --max-width: 1200px;
-  --header-height: 72px;
+  /* Shadow */
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md: 0 12px 28px rgba(0,0,0,0.10);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,0.16);
 
-  /* ===== TRANSITION ===== */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.25s ease;
+  /* Transition */
+  --transition: 0.3s cubic-bezier(.4,0,.2,1);
 }
 
-/* ---------- DARK MODE ---------- */
+/* ================= DARK MODE ================= */
 [data-theme="dark"] {
-  --primary: #ff3b3b;
-  --primary-hover: #ff1f1f;
 
-  /* ❗ Dark ก็ neutral */
-  --primary-soft: rgba(255, 255, 255, 0.06);
+  --bg: #0e0e11;
+  --bg-soft: #141417;
+  --card: #1c1c1f;
 
-  --bg: #0f1115;
-  --bg-soft: #141720;
-  --card: #1b1f2a;
+  --text: #f5f5f7;
+  --text-muted: #8e8e93;
 
-  --row-hover: rgba(255, 255, 255, 0.04);
+  --border: #2a2a2e;
 
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-invert: #000000;
-
-  --border: #2a2f3a;
-  --border-soft: #1f2430;
-
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.65);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
 }
 
 /* ================= RESET ================= */
@@ -82,59 +65,52 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
-
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont,
+               "SF Pro Text", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background var(--transition-base),
-              color var(--transition-base);
+  transition: background var(--transition),
+              color var(--transition);
 }
 
-/* ================= GLOBAL ELEMENT ================= */
+/* ================= LINKS FIX ================= */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
-button {
-  font-family: inherit;
-  outline: none;
-  border: none;
-  background: none;
-  cursor: pointer;
+a:hover {
+  color: var(--primary);
 }
 
 /* ================= LAYOUT ================= */
 .container {
-  max-width: var(--max-width);
+  max-width: 1100px;
   margin-inline: auto;
-  padding-inline: 16px;
+  padding: 40px 24px;
 }
 
 /* ================= CARD ================= */
 .card {
   background: var(--card);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+.card:hover {
   box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
 }
 
 /* ================= BUTTON ================= */
@@ -142,57 +118,117 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
+  min-height: 44px;
+  padding: 0 22px;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: all var(--transition-base);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text); /* กันโดน override */
 }
 
+/* 🔴 Primary (FIX สีขาวแน่นอน) */
 .btn-primary {
-  background: var(--primary);
-  color: var(--text-invert);
-  box-shadow: 0 10px 25px rgba(255, 0, 0, 0.25);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(225, 6, 0, 0.35);
 }
 
+/* Outline */
 .btn-outline {
-  border: 2px solid var(--primary);
-  color: var(--primary);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
 .btn-outline:hover {
-  background: var(--primary);
-  color: var(--text-invert);
+  background: var(--bg-soft);
+  color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ================= UTILITIES ================= */
-.muted {
+/* Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  background: rgba(0,0,0,0.05);
+  color: var(--text);
+}
+
+/* ================= INPUT ================= */
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* ================= TABLE ================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+thead {
+  background: linear-gradient(to right, #fafafa, #f4f4f5);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
-.center {
-  text-align: center;
+tbody tr {
+  transition: all 0.2s ease;
 }
 
-.hidden {
-  display: none !important;
+tbody tr:hover {
+  background: rgba(0,0,0,0.03);
+  color: var(--text); /* FIX ไม่ให้กลายเป็นขาว */
 }
+
+/* ================= UTILITIES ================= */
+.muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
-  html {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  html {
-    font-size: 14px;
+  .container {
+    padding: 28px 16px;
   }
 }

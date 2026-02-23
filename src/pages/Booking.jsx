@@ -73,7 +73,7 @@ export default function Booking() {
   );
 
   //////////////////////////////////////////////////////
-  // SUBMIT
+  // SUBMIT → CREATE RESERVATION → GO TO PAYMENT PAGE
   //////////////////////////////////////////////////////
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,14 +100,13 @@ export default function Booking() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      navigate("/payment", {
-        state: { reservation: data, totalPrice: data.totalPrice },
-      });
+      // ✅ FIXED: go to /payment/:id
+      navigate(`/payment/${data.id}`);
 
     } catch (err) {
       alert(
         err.response?.data?.message ||
-          "❌ รถไม่ว่างหรือเกิดข้อผิดพลาด"
+        "❌ รถไม่ว่างหรือเกิดข้อผิดพลาด"
       );
     } finally {
       setSubmitting(false);

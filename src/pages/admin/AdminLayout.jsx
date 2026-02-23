@@ -4,9 +4,9 @@ import "../styles/admin-layout.css";
 
 export default function AdminLayout() {
   return (
-    <div className="admin-layout">
-      <Sidebar />
-      <main className="admin-content">
+    <div >
+      {/* <Sidebar /> */}
+      <main >
         <Outlet />
       </main>
     </div>

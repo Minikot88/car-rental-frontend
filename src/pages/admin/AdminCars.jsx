@@ -1,241 +1,257 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+import "../styles/admin-cars.css";
 
 const API = import.meta.env.VITE_API_URL;
 
 export default function AdminCars() {
   const [cars, setCars] = useState([]);
   const [editing, setEditing] = useState(null);
-  const [viewing, setViewing] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const emptyForm = {
     name: "",
     brand: "",
     model: "",
-    year: "",
-    color: "",
-    transmission: "AUTO",
-    seats: "",
-    category: "SEDAN",
-    fuelType: "GASOLINE",
-    mileage: "",
     pricePerDay: "",
-    deposit: "",
-    image: "",
-    images: [],
     description: "",
-    features: [],
-    location: "",
-    status: "AVAILABLE",
   };
 
   const [form, setForm] = useState(emptyForm);
+
+  /* ================= FETCH ================= */
 
   useEffect(() => {
     fetchCars();
   }, []);
 
-  async function fetchCars() {
-    const res = await axios.get(`${API}/cars`);
-    setCars(res.data);
-  }
+  const fetchCars = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API}/cars`);
+      setCars(res.data);
+    } catch {
+      Swal.fire("Error", "โหลดรถไม่สำเร็จ", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  function openAdd() {
+  /* ================= ACTIONS ================= */
+
+  const openAdd = () => {
     setForm(emptyForm);
     setEditing({});
-  }
+  };
 
-  function openEdit(car) {
-    setForm({
-      ...car,
-      images: car.images || [],
-      features: car.features || [],
-    });
+  const openEdit = (car) => {
+    setForm(car);
     setEditing(car);
-  }
+  };
 
-  async function saveCar() {
+  const saveCar = async () => {
     try {
-      if (editing.id) {
+      if (editing?.id) {
         await axios.put(`${API}/cars/${editing.id}`, form);
       } else {
         await axios.post(`${API}/cars`, form);
       }
-      fetchCars();
+
+      await fetchCars();
       setEditing(null);
-    } catch (err) {
-      alert(err.response?.data?.message || "บันทึกไม่สำเร็จ");
+
+      Swal.fire({
+        icon: "success",
+        title: "บันทึกสำเร็จ",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch {
+      Swal.fire("ผิดพลาด", "บันทึกไม่สำเร็จ", "error");
     }
-  }
+  };
 
-  async function deleteCar(id) {
-    if (!window.confirm("ลบรถนี้?")) return;
+  const deleteCar = async (id) => {
+  const result = await Swal.fire({
+    title: "ยืนยันการลบ?",
+    text: "ลบแล้วจะไม่สามารถกู้คืนได้",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#e10600",
+    cancelButtonText: "ยกเลิก",
+    confirmButtonText: "ลบ",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    // แสดง loading ระหว่างลบ
+    Swal.fire({
+      title: "กำลังลบ...",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     await axios.delete(`${API}/cars/${id}`);
-    fetchCars();
-  }
+    await fetchCars();
 
-  function handleArray(field, value) {
-    const arr = value.split(",").map((v) => v.trim());
-    setForm({ ...form, [field]: arr });
+    Swal.fire({
+      icon: "success",
+      title: "ลบสำเร็จ",
+      text: "รายการรถถูกลบเรียบร้อยแล้ว",
+      timer: 1600,
+      showConfirmButton: false,
+    });
+
+  } catch {
+    Swal.fire({
+      icon: "error",
+      title: "ลบไม่สำเร็จ",
+      text: "เกิดข้อผิดพลาดในการลบ",
+    });
   }
+};
+
+  /* ================= UI ================= */
 
   return (
-    <>
-      <h1>จัดการรถ</h1>
+    <div className="admin-cars container">
+      <div className="page-header">
+        <h1>จัดการรถ</h1>
+        <button className="btn btn-primary" onClick={openAdd}>
+          ➕ เพิ่มรถ
+        </button>
+      </div>
 
-      <button onClick={openAdd}>➕ เพิ่มรถ</button>
-
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>ชื่อ</th>
-            <th>ยี่ห้อ</th>
-            <th>รุ่น</th>
-            <th>ราคา/วัน</th>
-            <th>สถานะ</th>
-            <th>จัดการ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cars.map((c) => (
-            <tr key={c.id}>
-              <td>{c.name}</td>
-              <td>{c.brand}</td>
-              <td>{c.model}</td>
-              <td>฿{c.pricePerDay}</td>
-              <td>{c.status}</td>
-              <td>
-                <button onClick={() => setViewing(c)}>👁 ดู</button>
-                <button onClick={() => openEdit(c)}>✏️ แก้ไข</button>
-                <button onClick={() => deleteCar(c.id)}>🗑 ลบ</button>
-              </td>
-            </tr>
+      {loading ? (
+        <div className="car-grid">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="car-card skeleton"></div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      ) : cars.length === 0 ? (
+        <div className="empty-state">
+          <p>🚗 ยังไม่มีรถในระบบ</p>
+          <button className="btn btn-primary" onClick={openAdd}>
+            เพิ่มคันแรกเลย
+          </button>
+        </div>
+      ) : (
+        <div className="car-grid">
+          {cars.map((c) => (
+            <div key={c.id} className="car-card">
+              <div className="car-header">
+                <div>
+                  <div className="car-title">{c.name}</div>
+                  <div className="car-sub">
+                    {c.brand} • {c.model}
+                  </div>
+                </div>
 
-      {/* ================= VIEW DETAIL ================= */}
-      {viewing && (
-        <div style={{ marginTop: 20, border: "1px solid #ccc", padding: 20 }}>
-          <h3>รายละเอียดรถ</h3>
+                <div className="car-price">
+                  ฿{Number(c.pricePerDay).toLocaleString()}
+                  <span>/วัน</span>
+                </div>
+              </div>
 
-          <p><b>ชื่อ:</b> {viewing.name}</p>
-          <p><b>ยี่ห้อ:</b> {viewing.brand}</p>
-          <p><b>รุ่น:</b> {viewing.model}</p>
-          <p><b>ปี:</b> {viewing.year}</p>
-          <p><b>สี:</b> {viewing.color}</p>
-          <p><b>เกียร์:</b> {viewing.transmission}</p>
-          <p><b>ที่นั่ง:</b> {viewing.seats}</p>
-          <p><b>ประเภท:</b> {viewing.category}</p>
-          <p><b>น้ำมัน:</b> {viewing.fuelType}</p>
-          <p><b>เลขไมล์:</b> {viewing.mileage}</p>
-          <p><b>ราคา/วัน:</b> ฿{viewing.pricePerDay}</p>
-          <p><b>เงินมัดจำ:</b> ฿{viewing.deposit}</p>
-          <p><b>สาขา:</b> {viewing.location}</p>
-          <p><b>สถานะ:</b> {viewing.status}</p>
-          <p><b>รายละเอียด:</b> {viewing.description}</p>
+              <p className="car-desc">{c.description}</p>
 
-          <button onClick={() => setViewing(null)}>ปิด</button>
+              <div className="car-actions">
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={() => openEdit(c)}
+                >
+                  แก้ไข
+                </button>
+
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => deleteCar(c.id)}
+                >
+                  ลบ
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* ================= EDIT FULL ================= */}
+      {/* ================= MODAL ================= */}
+
       {editing && (
-        <div style={{ marginTop: 20 }}>
-          <h3>{editing.id ? "แก้ไขรถ" : "เพิ่มรถ"}</h3>
+        <div className="modal-overlay" onClick={() => setEditing(null)}>
+          <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
+            <h2>{editing?.id ? "แก้ไขรถ" : "เพิ่มรถใหม่"}</h2>
 
-          <input placeholder="ชื่อรถ"
-            value={form.name}
-            onChange={(e)=>setForm({...form,name:e.target.value})}/>
+            <div className="form-group">
+              <label>ชื่อรถ</label>
+              <input
+                value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+              />
+            </div>
 
-          <input placeholder="ยี่ห้อ"
-            value={form.brand}
-            onChange={(e)=>setForm({...form,brand:e.target.value})}/>
+            <div className="form-group">
+              <label>ยี่ห้อ</label>
+              <input
+                value={form.brand}
+                onChange={(e) =>
+                  setForm({ ...form, brand: e.target.value })
+                }
+              />
+            </div>
 
-          <input placeholder="รุ่น"
-            value={form.model}
-            onChange={(e)=>setForm({...form,model:e.target.value})}/>
+            <div className="form-group">
+              <label>รุ่น</label>
+              <input
+                value={form.model}
+                onChange={(e) =>
+                  setForm({ ...form, model: e.target.value })
+                }
+              />
+            </div>
 
-          <input type="number" placeholder="ปี"
-            value={form.year}
-            onChange={(e)=>setForm({...form,year:e.target.value})}/>
+            <div className="form-group">
+              <label>ราคา / วัน</label>
+              <input
+                type="number"
+                value={form.pricePerDay}
+                onChange={(e) =>
+                  setForm({ ...form, pricePerDay: e.target.value })
+                }
+              />
+            </div>
 
-          <input placeholder="สี"
-            value={form.color}
-            onChange={(e)=>setForm({...form,color:e.target.value})}/>
+            <div className="form-group">
+              <label>รายละเอียด</label>
+              <textarea
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+              />
+            </div>
 
-          <select value={form.transmission}
-            onChange={(e)=>setForm({...form,transmission:e.target.value})}>
-            <option value="AUTO">AUTO</option>
-            <option value="MANUAL">MANUAL</option>
-          </select>
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={saveCar}>
+                บันทึก
+              </button>
 
-          <input type="number" placeholder="จำนวนที่นั่ง"
-            value={form.seats}
-            onChange={(e)=>setForm({...form,seats:e.target.value})}/>
-
-          <select value={form.category}
-            onChange={(e)=>setForm({...form,category:e.target.value})}>
-            <option value="SEDAN">SEDAN</option>
-            <option value="SUV">SUV</option>
-            <option value="VAN">VAN</option>
-            <option value="PICKUP">PICKUP</option>
-            <option value="HATCHBACK">HATCHBACK</option>
-            <option value="EV">EV</option>
-          </select>
-
-          <select value={form.fuelType}
-            onChange={(e)=>setForm({...form,fuelType:e.target.value})}>
-            <option value="GASOLINE">GASOLINE</option>
-            <option value="DIESEL">DIESEL</option>
-            <option value="HYBRID">HYBRID</option>
-            <option value="ELECTRIC">ELECTRIC</option>
-          </select>
-
-          <input placeholder="เลขไมล์"
-            value={form.mileage}
-            onChange={(e)=>setForm({...form,mileage:e.target.value})}/>
-
-          <input type="number" placeholder="ราคา/วัน"
-            value={form.pricePerDay}
-            onChange={(e)=>setForm({...form,pricePerDay:e.target.value})}/>
-
-          <input type="number" placeholder="เงินมัดจำ"
-            value={form.deposit}
-            onChange={(e)=>setForm({...form,deposit:e.target.value})}/>
-
-          <input placeholder="รูปหลัก (URL)"
-            value={form.image}
-            onChange={(e)=>setForm({...form,image:e.target.value})}/>
-
-          <input placeholder="หลายรูป (คั่นด้วย ,)"
-            value={form.images.join(",")}
-            onChange={(e)=>handleArray("images",e.target.value)}/>
-
-          <input placeholder="option (คั่นด้วย ,)"
-            value={form.features.join(",")}
-            onChange={(e)=>handleArray("features",e.target.value)}/>
-
-          <textarea placeholder="รายละเอียด"
-            value={form.description}
-            onChange={(e)=>setForm({...form,description:e.target.value})}/>
-
-          <input placeholder="สาขา"
-            value={form.location}
-            onChange={(e)=>setForm({...form,location:e.target.value})}/>
-
-          <select value={form.status}
-            onChange={(e)=>setForm({...form,status:e.target.value})}>
-            <option value="AVAILABLE">AVAILABLE</option>
-            <option value="BOOKED">BOOKED</option>
-            <option value="MAINTENANCE">MAINTENANCE</option>
-          </select>
-
-          <br /><br />
-          <button onClick={saveCar}>บันทึก</button>
-          <button onClick={()=>setEditing(null)}>ยกเลิก</button>
+              <button
+                className="btn btn-outline"
+                onClick={() => setEditing(null)}
+              >
+                ยกเลิก
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

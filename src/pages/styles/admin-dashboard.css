@@ -1,8 +1,9 @@
 /* ==================================================
-   ADMIN DASHBOARD (MOBILE FIRST / NO OVERFLOW FIX)
+   ADMIN DASHBOARD — PREMIUM RED EDITION
 ================================================== */
 
-/* 🔥 GLOBAL FIX */
+/* ================= GLOBAL SAFE ================= */
+
 *,
 *::before,
 *::after {
@@ -16,54 +17,68 @@ html, body {
 /* ==================================================
    HEADER
 ================================================== */
+
 .dashboard-header {
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 .dashboard-header h1 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.3px;
-  margin-bottom: 4px;
+  letter-spacing: -0.4px;
+  margin-bottom: 6px;
   color: var(--text);
-  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-header h1::before {
+  content: "";
+  width: 6px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(
+    to bottom,
+    var(--primary-light),
+    var(--primary)
+  );
 }
 
 .dashboard-subtitle {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
 /* Tablet */
 @media (min-width: 768px) {
   .dashboard-header h1 {
-    font-size: 26px;
+    font-size: 28px;
   }
 }
 
 /* ==================================================
    SECTION
 ================================================== */
+
 .section {
-  margin-top: 28px;
-  width: 100%;
-  max-width: 100%;
+  margin-top: 36px;
 }
 
 .section h2 {
   font-size: 16px;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--text);
 }
 
 .section h2::before {
   content: "";
   width: 4px;
-  height: 16px;
+  height: 18px;
   border-radius: 4px;
   background: var(--primary);
 }
@@ -71,7 +86,7 @@ html, body {
 /* Desktop spacing */
 @media (min-width: 1024px) {
   .section {
-    margin-top: 48px;
+    margin-top: 56px;
   }
 
   .section h2 {
@@ -80,25 +95,21 @@ html, body {
 }
 
 /* ==================================================
-   ANALYTICS GRID (MOBILE FIRST)
+   ANALYTICS GRID
 ================================================== */
+
 .analytics-grid {
   display: grid;
-  grid-template-columns: 1fr;   /* 🔥 1 column mobile */
-  gap: 14px;
-  width: 100%;
-  max-width: 100%;
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 
-/* Tablet */
 @media (min-width: 640px) {
   .analytics-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
   }
 }
 
-/* Desktop */
 @media (min-width: 1024px) {
   .analytics-grid {
     grid-template-columns: repeat(4, 1fr);
@@ -109,56 +120,69 @@ html, body {
 /* ==================================================
    STAT CARD
 ================================================== */
+
 .stat-card {
-  width: 100%;
-  max-width: 100%;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* subtle red accent line */
+.stat-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--primary);
+  opacity: 0.9;
 }
 
 .stat-title {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: var(--text);
   word-break: break-word;
 }
 
-/* Tablet */
 @media (min-width: 768px) {
-  .stat-card {
-    padding: 20px;
-  }
-
   .stat-value {
-    font-size: 28px;
+    font-size: 30px;
   }
 }
 
 /* ==================================================
-   CHART WRAPPER (FIX OVERFLOW)
+   CHART WRAPPER
 ================================================== */
+
 .chart-wrapper {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
   background: var(--card);
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.chart-wrapper:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .chart-wrapper canvas,
@@ -169,27 +193,43 @@ html, body {
 /* ==================================================
    DATA TABLE
 ================================================== */
+
 .data-table-wrapper {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
   background: var(--card);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  -webkit-overflow-scrolling: touch;
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
 }
 
 .data-table-wrapper table {
   width: 100%;
-  min-width: unset;
 }
 
-/* Optional Scrollbar */
-.data-table-wrapper::-webkit-scrollbar {
-  height: 6px;
+.data-table-wrapper th {
+  background: var(--bg-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-.data-table-wrapper::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+.data-table-wrapper tbody tr:hover {
+  background: var(--bg-soft);
+}
+
+/* ==================================================
+   DARK MODE ENHANCEMENT
+================================================== */
+
+[data-theme="dark"] .stat-card {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .chart-wrapper {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .data-table-wrapper th {
+  background: #202024;
 }

@@ -5,11 +5,8 @@ import {
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import generatePayload from "promptpay-qr";
-import QRCode from "qrcode";
 
 const API = import.meta.env.VITE_API_URL;
-const PROMPTPAY_ID = "0936400172";
 
 export default function Payment() {
   const { id } = useParams();
@@ -18,72 +15,80 @@ export default function Payment() {
 
   const [reservation, setReservation] = useState(null);
   const [qrCode, setQrCode] = useState("");
-  const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [pageLoading, setPageLoading] = useState(true);
 
   //////////////////////////////////////////////////////
-  // 1️⃣ FETCH RESERVATION (รองรับ refresh)
+  // FETCH RESERVATION
   //////////////////////////////////////////////////////
   useEffect(() => {
     async function fetchReservation() {
-      try {
-        if (!id) {
-          setPageLoading(false);
-          return;
+      const res = await axios.get(
+        `${API}/reservations/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
+      );
 
-        const res = await axios.get(
-          `${API}/reservations/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        setReservation(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setPageLoading(false);
-      }
+      setReservation(res.data);
+      setPageLoading(false);
     }
 
-    fetchReservation();
-  }, [id]);
+    if (id && token) fetchReservation();
+  }, [id, token]);
 
   //////////////////////////////////////////////////////
-  // 2️⃣ REDIRECT IF STATUS NOT ALLOWED
+  // CREATE QR ONCE
   //////////////////////////////////////////////////////
   useEffect(() => {
     if (!reservation) return;
+    if (qrCode) return;
 
-    if (reservation.status === "CONFIRMED") {
-      navigate(`/reservations/${reservation.id}`);
+    async function createQR() {
+      const res = await axios.post(
+        `${API}/payments/confirm`,
+        { reservationId: reservation.id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setQrCode(res.data.qrImage);
     }
 
     if (
-      reservation.status === "CANCELLED" ||
-      reservation.status === "EXPIRED"
+      ["PENDING", "WAITING_PAYMENT"].includes(
+        reservation.status
+      )
     ) {
-      navigate("/carslist");
+      createQR();
     }
-  }, [reservation, navigate]);
+  }, [reservation?.id]);
 
   //////////////////////////////////////////////////////
-  // 3️⃣ GENERATE QR
+  // AUTO REFRESH STATUS
   //////////////////////////////////////////////////////
   useEffect(() => {
     if (!reservation) return;
 
-    const payload = generatePayload(PROMPTPAY_ID, {
-      amount: reservation.totalPrice,
-    });
+    const interval = setInterval(async () => {
+      const res = await axios.get(
+        `${API}/payments/status/${reservation.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    QRCode.toDataURL(payload).then(setQrCode);
-  }, [reservation]);
+      if (res.data.reservationStatus === "CONFIRMED") {
+        navigate(`/reservations/${reservation.id}`);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [reservation?.id]);
 
   //////////////////////////////////////////////////////
-  // 4️⃣ COUNTDOWN TIMER
+  // COUNTDOWN
   //////////////////////////////////////////////////////
   useEffect(() => {
     if (!reservation?.lockExpiresAt) return;
@@ -94,10 +99,8 @@ export default function Payment() {
 
     const interval = setInterval(() => {
       const diff = expireTime - Date.now();
-
       if (diff <= 0) {
         clearInterval(interval);
-        alert("หมดเวลาชำระเงิน");
         navigate("/carslist");
       } else {
         setTimeLeft(diff);
@@ -105,11 +108,14 @@ export default function Payment() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [reservation, navigate]);
+  }, [reservation?.id]);
 
-  //////////////////////////////////////////////////////
-  // FORMAT TIME
-  //////////////////////////////////////////////////////
+  if (pageLoading)
+    return <p style={{ textAlign: "center" }}>Loading...</p>;
+
+  if (!reservation)
+    return <Navigate to="/carslist" />;
+
   const formatTime = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -118,104 +124,29 @@ export default function Payment() {
       .padStart(2, "0")}`;
   };
 
-  //////////////////////////////////////////////////////
-  // CONFIRM PAYMENT
-  //////////////////////////////////////////////////////
-  const handleConfirm = async () => {
-    try {
-      setLoading(true);
-
-      await axios.post(
-        `${API}/payments/confirm`,
-        {
-          reservationId: reservation.id,
-          method: "QR",
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      navigate(`/waiting/${reservation.id}`);
-    } catch (err) {
-      alert(
-        err.response?.data?.message ||
-          "เกิดข้อผิดพลาด"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //////////////////////////////////////////////////////
-  // RENDER GUARD
-  //////////////////////////////////////////////////////
-  if (pageLoading)
-    return <p style={{ textAlign: "center" }}>กำลังโหลด...</p>;
-
-  if (!reservation)
-    return <Navigate to="/carslist" />;
-
-  //////////////////////////////////////////////////////
-  // ALLOW CONFIRM?
-  //////////////////////////////////////////////////////
-  const canConfirm =
-    reservation.status === "PENDING" ||
-    reservation.status === "WAITING_PAYMENT";
-
-  //////////////////////////////////////////////////////
-  // UI
-  //////////////////////////////////////////////////////
   return (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "40px",
-      }}
-    >
-      <h2>ชำระเงินผ่าน PromptPay</h2>
-
-      <h3>BL-{reservation.id}</h3>
-      <h3>
-        ยอดชำระ: ฿
-        {reservation.totalPrice.toLocaleString()}
-      </h3>
+    <div style={{ textAlign: "center", padding: 40 }}>
+      <h2>PromptPay Payment</h2>
+      <h3>Reservation #{reservation.id}</h3>
+      <h3>฿{reservation.totalPrice}</h3>
 
       {reservation.lockExpiresAt && (
         <h2 style={{ color: "red" }}>
-          เวลาคงเหลือ: {formatTime(timeLeft)}
+          Time left: {formatTime(timeLeft)}
         </h2>
       )}
 
-      {qrCode && (
+      {qrCode ? (
         <img
           src={qrCode}
           alt="QR Code"
-          style={{
-            width: "280px",
-            margin: "20px 0",
-          }}
+          style={{ width: 280 }}
         />
+      ) : (
+        <p>Generating QR...</p>
       )}
 
-      <p>สถานะปัจจุบัน: {reservation.status}</p>
-
-      <button
-        onClick={handleConfirm}
-        disabled={!canConfirm || loading}
-        style={{
-          opacity: !canConfirm ? 0.5 : 1,
-          padding: "12px 24px",
-          fontSize: "16px",
-          cursor: !canConfirm
-            ? "not-allowed"
-            : "pointer",
-        }}
-      >
-        {loading
-          ? "กำลังส่งคำขอ..."
-          : "ยืนยันการชำระเงิน"}
-      </button>
+      <p>Status: {reservation.status}</p>
     </div>
   );
 }
