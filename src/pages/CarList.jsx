@@ -1,20 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { carData } from "../data/cars";
+import axios from "axios";
 import "./styles/CarList.css";
 
-export default function CarList() {
-  const [keyword, setKeyword] = useState("");
+const API = import.meta.env.VITE_API_URL;
 
-  const filteredCars = carData.filter((car) =>
-    car.name.toLowerCase().includes(keyword.toLowerCase())
+export default function CarList() {
+  const [cars, setCars] = useState([]);
+  const [keyword, setKeyword] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  
+
+  useEffect(() => {
+    fetchCars();
+  }, []);
+
+  async function fetchCars() {
+    try {
+      const res = await axios.get(`${API}/cars`);
+      setCars(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filteredCars = cars.filter((car) =>
+    `${car.name} ${car.category}`
+      .toLowerCase()
+      .includes(keyword.toLowerCase())
   );
+
+  function getStatusBadge(status) {
+    if (status === "AVAILABLE")
+      return <span className="success">🟢 ว่าง</span>;
+
+    if (status === "BOOKED")
+      return <span className="warning">🟡 ถูกจอง</span>;
+
+    if (status === "MAINTENANCE")
+      return <span className="danger">🔴 ซ่อมบำรุง</span>;
+
+    return <span>{status}</span>;
+  }
+
+  if (loading) return <p>กำลังโหลด...</p>;
 
   return (
     <div className="carlist-layout">
-      {/* ========== MAIN ========== */}
       <main className="carlist-page">
-        {/* Search */}
+
+        {/* SEARCH */}
         <div className="carlist-search">
           <input
             type="text"
@@ -22,7 +60,6 @@ export default function CarList() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
-          <button>ค้นหา</button>
         </div>
 
         <p className="carlist-result">
@@ -30,45 +67,33 @@ export default function CarList() {
         </p>
 
         <div className="carlist-grid">
-          {filteredCars.map((car, i) => (
+          {filteredCars.map((car) => (
             <div key={car.id} className="carlist-card">
+
               {/* IMAGE */}
               <div className="carlist-image-wrap">
-                <img src={car.image} alt={car.name} />
+                <img
+                  src={car.image || "/no-image.png"}
+                  alt={car.name}
+                />
               </div>
 
               {/* INFO */}
               <div className="carlist-info-wrap">
                 <h3 className="car-name">{car.name}</h3>
 
-                {/* ⭐ Rating */}
-                <div className="car-rating">
-                  ⭐ 4.{(i % 5) + 3} ( {20 + i * 3} รีวิว )
-                </div>
-
                 <div className="car-meta">
-                  <span>🚘 {car.type}</span>
+                  <span>🚘 {car.category}</span>
                   <span>👥 {car.seats} ที่นั่ง</span>
                   <span>⚙️ {car.transmission}</span>
                 </div>
 
-                {/* 📍 Pickup */}
                 <div className="car-pickup">
-                  📍 รับรถ: สนามบิน / สำนักงาน
+                  📍 รับรถ: {car.location || "สนามบิน"}
                 </div>
 
-                {/* 🟢 Availability */}
                 <div className="car-availability">
-                  {i % 4 === 0 ? (
-                    <span className="danger">❗ เหลือ 1 คัน</span>
-                  ) : (
-                    <span className="success">🟢 รถว่าง</span>
-                  )}
-                </div>
-
-                {/* ❌ Policy */}
-                <div className="car-policy">
-                  ❌ ยกเลิกฟรีภายใน 24 ชม.
+                  {getStatusBadge(car.status)}
                 </div>
               </div>
 
@@ -76,16 +101,33 @@ export default function CarList() {
               <div className="carlist-price-wrap">
                 <div className="price-label">ราคา / วัน</div>
                 <div className="car-price">
-                  ฿{car.price.toLocaleString()}
+                  ฿{car.pricePerDay.toLocaleString()}
                 </div>
+
+                {car.status === "AVAILABLE" ? (
+                  <Link
+                    to={`/booking/${car.id}`}
+                    className="carlist-detail-btn"
+                  >
+                    จองเลย
+                  </Link>
+                ) : (
+                  <button
+                    className="carlist-detail-btn disabled"
+                    disabled
+                  >
+                    ไม่ว่าง
+                  </button>
+                )}
 
                 <Link
                   to={`/carsdetail/${car.id}`}
-                  className="carlist-detail-btn"
+                  className="carlist-detail-btn outline"
                 >
                   ดูรายละเอียด
                 </Link>
               </div>
+
             </div>
           ))}
         </div>

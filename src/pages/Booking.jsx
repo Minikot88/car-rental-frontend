@@ -1,185 +1,196 @@
-import {
-  useParams,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
-import { useState, useMemo } from "react";
-import { carData } from "../data/cars";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import "./styles/Booking.css";
+
+const API = import.meta.env.VITE_API_URL;
 
 export default function Booking() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { state } = useLocation();
+  const token = localStorage.getItem("token");
 
-  const { start, end } = location.state || {};
+  const today = new Date().toISOString().slice(0, 10);
+  const format = (d) => (d ? new Date(d).toISOString().slice(0, 10) : "");
 
-  const car = carData.find(
-    (c) => String(c.id) === String(id)
-  );
+  const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  /* ===== helper ===== */
-  const formatDate = (date) =>
-    date
-      ? new Date(date).toISOString().slice(0, 10)
-      : "";
-
-  /* ===== HOOKS MUST BE HERE ===== */
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    start: formatDate(start),
-    end: formatDate(end),
+    start: format(state?.start),
+    end: format(state?.end),
   });
 
+  //////////////////////////////////////////////////////
+  // INIT
+  //////////////////////////////////////////////////////
+  useEffect(() => {
+    if (!token) return navigate("/login");
+
+    (async () => {
+      try {
+        const [carRes, userRes] = await Promise.all([
+          axios.get(`${API}/cars/${id}`),
+          axios.get(`${API}/users/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        setCar(carRes.data);
+        const u = userRes.data;
+
+        setForm((f) => ({
+          ...f,
+          name: `${u.name} ${u.surname}`,
+          phone: u.phone,
+        }));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id, token, navigate]);
+
+  //////////////////////////////////////////////////////
+  // CALC
+  //////////////////////////////////////////////////////
   const rentalDays = useMemo(() => {
     if (!form.start || !form.end) return 1;
     const diff =
       (new Date(form.end) - new Date(form.start)) /
       (1000 * 60 * 60 * 24);
     return Math.max(1, Math.ceil(diff));
-  }, [form.start, form.end]);
+  }, [form]);
 
-  const totalPrice = useMemo(() => {
-    return car ? rentalDays * car.price : 0;
-  }, [rentalDays, car]);
+  const totalPrice = useMemo(
+    () => (car ? rentalDays * car.pricePerDay : 0),
+    [rentalDays, car]
+  );
 
-  /* ===== GUARD AFTER HOOKS ===== */
-  if (!car) {
-    return (
-      <p className="booking-error">
-        ไม่พบข้อมูลรถ
-      </p>
-    );
-  }
-
-  const handleChange = (e) =>
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-
-  const handleSubmit = (e) => {
+  //////////////////////////////////////////////////////
+  // SUBMIT
+  //////////////////////////////////////////////////////
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
-    navigate("/payment", {
-      state: {
-        car,
-        form,
-        rentalDays,
-        totalPrice,
-      },
-    });
+    if (!form.start || !form.end)
+      return alert("กรุณาเลือกวันที่");
+
+    if (form.start < today || form.start >= form.end)
+      return alert("วันที่ไม่ถูกต้อง");
+
+    try {
+      setSubmitting(true);
+
+      const { data } = await axios.post(
+        `${API}/reservations`,
+        {
+          carId: Number(id),
+          startDate: form.start,
+          endDate: form.end,
+          pickupLocation: "สาขาหลัก",
+          dropoffLocation: "สาขาหลัก",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      navigate("/payment", {
+        state: { reservation: data, totalPrice: data.totalPrice },
+      });
+
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          "❌ รถไม่ว่างหรือเกิดข้อผิดพลาด"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (loading) return <p>กำลังโหลด...</p>;
+  if (!car) return <p>❌ ไม่พบข้อมูลรถ</p>;
+
+  //////////////////////////////////////////////////////
+  // UI
+  //////////////////////////////////////////////////////
   return (
     <div className="booking-page">
       <div className="booking-layout">
 
-        {/* ================= LEFT ================= */}
         <form className="booking-left" onSubmit={handleSubmit}>
           <div className="card">
             <h2>ข้อมูลผู้จอง</h2>
-
-            <div className="booking-field">
-              <label>ชื่อ - นามสกุล</label>
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="booking-field">
-              <label>เบอร์โทรศัพท์</label>
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              name="name"
+              value={form.name}
+              onChange={(e) =>
+                setForm({ ...form, name: e.target.value })
+              }
+              required
+            />
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={(e) =>
+                setForm({ ...form, phone: e.target.value })
+              }
+              required
+            />
           </div>
 
           <div className="card">
-            <h3>วันที่เช่ารถ</h3>
-
-            <div className="booking-dates">
-              <div className="booking-field">
-                <label>วันรับรถ</label>
-                <input
-                  type="date"
-                  name="start"
-                  value={form.start}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="booking-field">
-                <label>วันคืนรถ</label>
-                <input
-                  type="date"
-                  name="end"
-                  value={form.end}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
+            <h3>วันที่เช่า</h3>
+            <input
+              type="date"
+              name="start"
+              min={today}
+              value={form.start}
+              onChange={(e) =>
+                setForm({ ...form, start: e.target.value })
+              }
+              required
+            />
+            <input
+              type="date"
+              name="end"
+              min={form.start || today}
+              value={form.end}
+              onChange={(e) =>
+                setForm({ ...form, end: e.target.value })
+              }
+              required
+            />
           </div>
 
-          <button className="booking-submit">
-            ดำเนินการต่อ
+          <button className="booking-submit" disabled={submitting}>
+            {submitting ? "กำลังดำเนินการ..." : "ดำเนินการต่อ"}
           </button>
         </form>
 
-        {/* ================= RIGHT ================= */}
         <aside className="booking-right">
           <div className="card">
-            <div className="booking-summary-image">
-              <img
-                src={car.image || car.img}
-                alt={car.name}
-              />
-            </div>
+            <img src={car.image || "/no-image.png"} alt={car.name} />
             <h3>{car.name}</h3>
-            <p className="muted">
-              {car.type || "รถยนต์"} • {car.seats || 5} ที่นั่ง
-            </p>
+            <p>{car.category} • {car.seats} ที่นั่ง</p>
           </div>
 
           <div className="card">
-            <h4>รายละเอียดการเช่า</h4>
-            <div className="summary-row">
-              <span>รับรถ</span>
-              <strong>{form.start}</strong>
-            </div>
-            <div className="summary-row">
-              <span>คืนรถ</span>
-              <strong>{form.end}</strong>
-            </div>
-            <div className="summary-row">
-              <span>จำนวนวัน</span>
-              <strong>{rentalDays}</strong>
-            </div>
+            <div>รับรถ: {form.start}</div>
+            <div>คืนรถ: {form.end}</div>
+            <div>จำนวนวัน: {rentalDays}</div>
           </div>
 
           <div className="card price-card">
-            <h4>ราคา</h4>
-            <div className="summary-row">
-              <span>ราคา / วัน</span>
-              <span>
-                ฿{car.price.toLocaleString()}
-              </span>
-            </div>
-            <div className="summary-divider" />
+            <div>ราคา/วัน: ฿{car.pricePerDay.toLocaleString()}</div>
             <div className="summary-total">
-              <span>ราคารวม</span>
-              <strong>
-                ฿{totalPrice.toLocaleString()}
-              </strong>
+              รวมทั้งหมด: ฿{totalPrice.toLocaleString()}
             </div>
           </div>
         </aside>

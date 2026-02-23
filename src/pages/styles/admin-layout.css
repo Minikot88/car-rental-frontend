@@ -27,3 +27,23 @@
   color: var(--text);
   letter-spacing: -0.3px;
 }
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 120px);
+}
+
+.admin-content {
+  flex: 1;
+  padding: 16px;
+  background: #f5f6fa;
+  overflow-x: hidden;   /* 🔥 สำคัญมาก */
+}
+
+@media (min-width: 768px) {
+  .admin-content {
+    padding: 24px;
+  }
+}

@@ -1,98 +1,221 @@
-import { useLocation, Navigate } from "react-router-dom";
-import { useState } from "react";
-import "./styles/Payment.css";
+import {
+  useNavigate,
+  useParams,
+  Navigate,
+} from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import generatePayload from "promptpay-qr";
+import QRCode from "qrcode";
+
+const API = import.meta.env.VITE_API_URL;
+const PROMPTPAY_ID = "0936400172";
 
 export default function Payment() {
-  const { state } = useLocation();
-  const [method, setMethod] = useState("cash");
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  if (!state) return <Navigate to="/cars" />;
+  const [reservation, setReservation] = useState(null);
+  const [qrCode, setQrCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [pageLoading, setPageLoading] = useState(true);
 
-  const { car, form, rentalDays, totalPrice } = state;
+  //////////////////////////////////////////////////////
+  // 1️⃣ FETCH RESERVATION (รองรับ refresh)
+  //////////////////////////////////////////////////////
+  useEffect(() => {
+    async function fetchReservation() {
+      try {
+        if (!id) {
+          setPageLoading(false);
+          return;
+        }
 
-  const handleConfirm = () => {
-    alert(`เลือกชำระเงินแบบ: ${method}`);
-    // ต่อ API / บันทึก DB / redirect success ได้ตรงนี้
+        const res = await axios.get(
+          `${API}/reservations/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        setReservation(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setPageLoading(false);
+      }
+    }
+
+    fetchReservation();
+  }, [id]);
+
+  //////////////////////////////////////////////////////
+  // 2️⃣ REDIRECT IF STATUS NOT ALLOWED
+  //////////////////////////////////////////////////////
+  useEffect(() => {
+    if (!reservation) return;
+
+    if (reservation.status === "CONFIRMED") {
+      navigate(`/reservations/${reservation.id}`);
+    }
+
+    if (
+      reservation.status === "CANCELLED" ||
+      reservation.status === "EXPIRED"
+    ) {
+      navigate("/carslist");
+    }
+  }, [reservation, navigate]);
+
+  //////////////////////////////////////////////////////
+  // 3️⃣ GENERATE QR
+  //////////////////////////////////////////////////////
+  useEffect(() => {
+    if (!reservation) return;
+
+    const payload = generatePayload(PROMPTPAY_ID, {
+      amount: reservation.totalPrice,
+    });
+
+    QRCode.toDataURL(payload).then(setQrCode);
+  }, [reservation]);
+
+  //////////////////////////////////////////////////////
+  // 4️⃣ COUNTDOWN TIMER
+  //////////////////////////////////////////////////////
+  useEffect(() => {
+    if (!reservation?.lockExpiresAt) return;
+
+    const expireTime = new Date(
+      reservation.lockExpiresAt
+    ).getTime();
+
+    const interval = setInterval(() => {
+      const diff = expireTime - Date.now();
+
+      if (diff <= 0) {
+        clearInterval(interval);
+        alert("หมดเวลาชำระเงิน");
+        navigate("/carslist");
+      } else {
+        setTimeLeft(diff);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [reservation, navigate]);
+
+  //////////////////////////////////////////////////////
+  // FORMAT TIME
+  //////////////////////////////////////////////////////
+  const formatTime = (ms) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
+  //////////////////////////////////////////////////////
+  // CONFIRM PAYMENT
+  //////////////////////////////////////////////////////
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+
+      await axios.post(
+        `${API}/payments/confirm`,
+        {
+          reservationId: reservation.id,
+          method: "QR",
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      navigate(`/waiting/${reservation.id}`);
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          "เกิดข้อผิดพลาด"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //////////////////////////////////////////////////////
+  // RENDER GUARD
+  //////////////////////////////////////////////////////
+  if (pageLoading)
+    return <p style={{ textAlign: "center" }}>กำลังโหลด...</p>;
+
+  if (!reservation)
+    return <Navigate to="/carslist" />;
+
+  //////////////////////////////////////////////////////
+  // ALLOW CONFIRM?
+  //////////////////////////////////////////////////////
+  const canConfirm =
+    reservation.status === "PENDING" ||
+    reservation.status === "WAITING_PAYMENT";
+
+  //////////////////////////////////////////////////////
+  // UI
+  //////////////////////////////////////////////////////
   return (
-    <div className="payment-page">
-      <div className="payment-card">
-        <h2 className="payment-title">ชำระเงิน</h2>
+    <div
+      style={{
+        textAlign: "center",
+        padding: "40px",
+      }}
+    >
+      <h2>ชำระเงินผ่าน PromptPay</h2>
 
-        {/* ===== BOOKING SUMMARY ===== */}
-        <div className="payment-summary">
-          <div className="payment-row">
-            <span>รถ</span>
-            <strong>{car.name}</strong>
-          </div>
-          <div className="payment-row">
-            <span>ผู้จอง</span>
-            <strong>{form.name}</strong>
-          </div>
-          <div className="payment-row">
-            <span>จำนวนวัน</span>
-            <strong>{rentalDays} วัน</strong>
-          </div>
+      <h3>BL-{reservation.id}</h3>
+      <h3>
+        ยอดชำระ: ฿
+        {reservation.totalPrice.toLocaleString()}
+      </h3>
 
-          <div className="payment-total">
-            <span>ยอดชำระ</span>
-            <strong>฿{totalPrice.toLocaleString()}</strong>
-          </div>
-        </div>
+      {reservation.lockExpiresAt && (
+        <h2 style={{ color: "red" }}>
+          เวลาคงเหลือ: {formatTime(timeLeft)}
+        </h2>
+      )}
 
-        {/* ===== PAYMENT METHODS ===== */}
-        <div className="payment-methods">
-          <h3>เลือกวิธีชำระเงิน</h3>
+      {qrCode && (
+        <img
+          src={qrCode}
+          alt="QR Code"
+          style={{
+            width: "280px",
+            margin: "20px 0",
+          }}
+        />
+      )}
 
-          <label className={`method-card ${method === "cash" ? "active" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="cash"
-              checked={method === "cash"}
-              onChange={() => setMethod("cash")}
-            />
-            <div>
-              <strong>💵 เงินสด</strong>
-              <p>ชำระเงินสดในวันรับรถ</p>
-            </div>
-          </label>
+      <p>สถานะปัจจุบัน: {reservation.status}</p>
 
-          <label className={`method-card ${method === "qr" ? "active" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="qr"
-              checked={method === "qr"}
-              onChange={() => setMethod("qr")}
-            />
-            <div>
-              <strong>📱 QR Code (PromptPay)</strong>
-              <p>สแกนเพื่อชำระผ่าน Mobile Banking</p>
-            </div>
-          </label>
-
-          <label className={`method-card ${method === "bank" ? "active" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="bank"
-              checked={method === "bank"}
-              onChange={() => setMethod("bank")}
-            />
-            <div>
-              <strong>🏦 โอนผ่านธนาคาร</strong>
-              <p>โอนผ่านแอปธนาคาร</p>
-            </div>
-          </label>
-        </div>
-
-        {/* ===== ACTION ===== */}
-        <button className="payment-confirm" onClick={handleConfirm}>
-          ยืนยันการชำระเงิน
-        </button>
-      </div>
+      <button
+        onClick={handleConfirm}
+        disabled={!canConfirm || loading}
+        style={{
+          opacity: !canConfirm ? 0.5 : 1,
+          padding: "12px 24px",
+          fontSize: "16px",
+          cursor: !canConfirm
+            ? "not-allowed"
+            : "pointer",
+        }}
+      >
+        {loading
+          ? "กำลังส่งคำขอ..."
+          : "ยืนยันการชำระเงิน"}
+      </button>
     </div>
   );
 }

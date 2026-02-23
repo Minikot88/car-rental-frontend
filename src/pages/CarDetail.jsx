@@ -1,163 +1,169 @@
 import { useParams, Link } from "react-router-dom";
-import { carData } from "../data/cars";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import "./styles/CarDetail.css";
 
-function CarDetail() {
-  const { id } = useParams();
+const API = import.meta.env.VITE_API_URL;
 
-  /* ================= FIND CAR (DERIVED DATA) ================= */
-  const car = carData.find(
-    (c) => String(c.id) === String(id)
+export default function CarDetail() {
+  const { id } = useParams();
+  const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ เลือกปีได้
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear()
   );
 
-  /* ================= MOCK AVAILABILITY ================= */
-  const unavailableDates = [
-    "2026-01-20",
-    "2026-01-21",
-    "2026-01-25",
-    "2026-01-28",
-  ];
-
-  /* ================= SCROLL ANIMATION ================= */
+  //////////////////////////////////////////////////////
+  // FETCH
+  //////////////////////////////////////////////////////
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal");
+    (async () => {
+      try {
+        const { data } = await axios.get(`${API}/cars/${id}/detail`);
+        setCar(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id]);
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add("show");
-        });
-      },
-      { threshold: 0.25 }
-    );
+  //////////////////////////////////////////////////////
+  // รวมวันไม่ว่าง
+  //////////////////////////////////////////////////////
+  const unavailableDates = useMemo(() => {
+    if (!car?.reservations) return [];
 
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
+    const dates = [];
 
-  /* ================= NOT FOUND ================= */
-  if (!car) {
-    return (
-      <div className="car-detail-loading">
-        ❌ ไม่พบข้อมูลรถ
-      </div>
-    );
-  }
+    car.reservations.forEach((r) => {
+      let current = new Date(r.startDate);
+      const end = new Date(r.endDate);
 
-  /* mock เดือน/วันนี้ */
-  const mockMonth = "2026-01";
-  const today = 15;
+      while (current <= end) {
+        dates.push(current.toISOString().split("T")[0]);
+        current.setDate(current.getDate() + 1);
+      }
+    });
 
+    return dates;
+  }, [car]);
+
+  //////////////////////////////////////////////////////
+  // RATING
+  //////////////////////////////////////////////////////
+  const rating = useMemo(() => {
+    if (!car?.reviews?.length) return "4.5";
+    const avg =
+      car.reviews.reduce((a, b) => a + b.rating, 0) /
+      car.reviews.length;
+    return avg.toFixed(1);
+  }, [car]);
+
+  if (loading) return <p>กำลังโหลด...</p>;
+  if (!car) return <p>❌ ไม่พบข้อมูลรถ</p>;
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  //////////////////////////////////////////////////////
+  // UI
+  //////////////////////////////////////////////////////
   return (
     <div className="car-detail-page">
-      {/* ================= HERO ================= */}
-      <div className="car-detail-hero reveal">
-        {/* IMAGE */}
+
+      {/* HERO */}
+      <div className="car-detail-hero">
         <div className="car-detail-image-wrap">
-          <img src={car.image} alt={car.name} />
+          <img src={car.image || "/no-image.png"} alt={car.name} />
         </div>
 
-        {/* INFO */}
         <div className="car-detail-info">
-          <h1 className="car-detail-title">{car.name}</h1>
+          <h1>{car.name}</h1>
 
           <div className="car-detail-rating">
-            ⭐ {car.ratings?.score ?? 4.5}
-            <span>({car.ratings?.reviews ?? 0} รีวิว)</span>
-            <span className="badge success">พร้อมใช้งาน</span>
+            ⭐ {rating}
+            <span> ({car.reviews?.length || 0} รีวิว)</span>
           </div>
 
           <div className="car-detail-meta">
-            <span>🚘 {car.type}</span>
+            <span>🚘 {car.category}</span>
             <span>👥 {car.seats} ที่นั่ง</span>
             <span>⚙️ {car.transmission}</span>
           </div>
 
-          <div className="car-detail-price pop">
-            ฿{car.price.toLocaleString()}
-            <span>/วัน</span>
+          <div className="car-detail-price">
+            ฿{car.pricePerDay.toLocaleString()} <span>/วัน</span>
           </div>
 
-          <ul className="car-detail-benefits">
-            <li>✔ ประกันพื้นฐาน</li>
-            <li>✔ ยกเลิกฟรี 24 ชม.</li>
-            <li>✔ รับ–คืนสนามบิน</li>
-            <li>✔ ไม่มีค่าธรรมเนียมแอบแฝง</li>
-          </ul>
-
+          {car.status === "AVAILABLE" && (
+            <Link
+              to={`/booking/${car.id}`}
+              className="btn-primary"
+            >
+              จองรถคันนี้
+            </Link>
+          )}
         </div>
       </div>
 
-      {/* ================= DETAILS ================= */}
-      <section className="car-detail-section reveal">
-        <h2>รายละเอียดรถ</h2>
+      {/* YEAR SELECT */}
+      <section className="car-detail-section">
+        <h2>สถานะรถทั้งปี</h2>
 
-        <div className="car-detail-grid">
-          <div>
-            <strong>ประเภทรถ</strong>
-            <span>{car.type}</span>
-          </div>
-          <div>
-            <strong>จำนวนที่นั่ง</strong>
-            <span>{car.seats}</span>
-          </div>
-          <div>
-            <strong>ระบบเกียร์</strong>
-            <span>{car.transmission}</span>
-          </div>
-          <div>
-            <strong>เชื้อเพลิง</strong>
-            <span>{car.fuel}</span>
-          </div>
-          <div>
-            <strong>ปีรถ</strong>
-            <span>{car.year}</span>
-          </div>
-          <div>
-            <strong>สถานะ</strong>
-            <span className="success">พร้อมใช้งาน</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= AVAILABILITY ================= */}
-      <section className="car-detail-section reveal">
-        <h2>สถานะรถ (เดือนนี้)</h2>
-
-        <div className="availability-legend">
-          <span><i className="dot available" /> ว่าง</span>
-          <span><i className="dot unavailable" /> ไม่ว่าง</span>
-          <span><i className="dot today" /> วันนี้</span>
+        <div style={{ marginBottom: 20 }}>
+          <label>เลือกปี: </label>
+          <input
+            type="number"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+          />
         </div>
 
-        <div className="availability-grid">
-          {Array.from({ length: 30 }).map((_, i) => {
-            const day = i + 1;
-            const dateStr = `${mockMonth}-${String(day).padStart(2, "0")}`;
-            const isUnavailable = unavailableDates.includes(dateStr);
-            const isToday = day === today;
+        <div className="year-calendar">
+          {months.map((month) => {
+            const monthStr =
+              `${selectedYear}-${String(month).padStart(2, "0")}`;
+
+            const daysInMonth =
+              new Date(selectedYear, month, 0).getDate();
 
             return (
-              <div
-                key={day}
-                className={`availability-day
-                  ${isUnavailable ? "unavailable" : "available"}
-                  ${isToday ? "today" : ""}
-                `}
-              >
-                {day}
+              <div key={month} className="month-block">
+                <h3>
+                  {new Date(selectedYear, month - 1)
+                    .toLocaleString("th-TH", { month: "long" })}
+                </h3>
+
+                <div className="availability-grid">
+                  {Array.from({ length: daysInMonth }).map((_, i) => {
+                    const day = i + 1;
+                    const dateStr =
+                      `${monthStr}-${String(day).padStart(2, "0")}`;
+
+                    const isUnavailable =
+                      unavailableDates.includes(dateStr);
+
+                    return (
+                      <div
+                        key={day}
+                        className={`availability-day
+                          ${isUnavailable ? "unavailable" : "available"}
+                          ${dateStr === todayStr ? "today" : ""}`}
+                      >
+                        {day}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </div>
-
-        <p className="availability-note muted">
-          * ข้อมูลนี้เป็น mockup ระบบจริงจะอัปเดตจากการจอง
-        </p>
       </section>
     </div>
   );
 }
-
-export default CarDetail;

@@ -9,15 +9,14 @@ export default function ThemeToggle({ compact = false }) {
       className={`theme-toggle-btn ${compact ? "compact" : ""}`}
       onClick={toggleTheme}
       aria-label="Toggle theme"
-      title="Toggle dark / light mode"
     >
-      <span className="theme-icon">
-        {theme === "light" ? "🌙" : "☀️"}
+      <span className="theme-track">
+        <span className={`theme-thumb ${theme}`} />
       </span>
 
       {!compact && (
         <span className="theme-label">
-          {theme === "light" ? "Dark" : "Light"}
+          {theme === "light" ? "Dark Mode" : "Light Mode"}
         </span>
       )}
     </button>

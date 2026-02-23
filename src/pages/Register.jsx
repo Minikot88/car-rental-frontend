@@ -1,81 +1,68 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import "./styles/Login.css"; // shared auth styles
+import { Link, useNavigate } from "react-router-dom";
+import api from "../utils/api";
+import "./styles/Login.css";
 
 function Register() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
-    fullname: "",
-    email: "",
+    username: "",
+    name: "",
+    surname: "",
+    phone: "",
+    address: "",
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("REGISTER DATA:", form);
-    // TODO: call register API
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      await api.post("/auth/register", form);
+      navigate("/login", { replace: true });
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+        "สมัครสมาชิกไม่สำเร็จ"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-page">
-      {/* show class is required so card is visible */}
       <div className="auth-card show">
-        <h2 className="auth-title">สมัครสมาชิก</h2>
+        <h2>สมัครสมาชิก</h2>
 
         <form onSubmit={handleSubmit}>
-          {/* Fullname */}
-          <div className="input-group">
-            <span className="input-icon">👤</span>
-            <input
-              type="text"
-              name="fullname"
-              placeholder="ชื่อ - นามสกุล"
-              value={form.fullname}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <input name="username" placeholder="Username" onChange={handleChange} required />
+          <input name="name" placeholder="ชื่อ" onChange={handleChange} required />
+          <input name="surname" placeholder="นามสกุล" onChange={handleChange} required />
+          <input name="phone" placeholder="เบอร์โทร" onChange={handleChange} required />
+          <input name="address" placeholder="ที่อยู่" onChange={handleChange} required />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
 
-          {/* Email */}
-          <div className="input-group">
-            <span className="input-icon">📧</span>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Password */}
-          <div className="input-group">
-            <span className="input-icon">🔒</span>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-            />
-          </div>
-
-          <button type="submit" className="auth-button">
-            สมัครสมาชิก
+          <button type="submit" disabled={loading}>
+            {loading ? "กำลังสมัคร..." : "สมัครสมาชิก"}
           </button>
         </form>
 
-        <p className="auth-note">
-          มีบัญชีแล้วใช่ไหม? <Link to="/login">เข้าสู่ระบบ</Link>
+        <p>
+          มีบัญชีแล้ว? <Link to="/login">เข้าสู่ระบบ</Link>
         </p>
       </div>
     </div>

@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { DateRange } from "react-date-range";
-import { carData } from "../data/cars";
-import { getRentalDays } from "../utils/availability";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import "./styles/CarSearch.css";
@@ -21,16 +19,6 @@ export default function CarSearch({ onSearch }) {
   });
 
   /* ===== rental days + price estimate ===== */
-  const rentalDays = getRentalDays(
-    range.startDate,
-    range.endDate
-  );
-
-  const avgPrice =
-    carData.reduce((sum, c) => sum + c.price, 0) / carData.length;
-
-  const totalEstimate = Math.round(avgPrice * rentalDays);
-
   const handleSearch = () => {
     onSearch({
       pickupDate: range.startDate,
@@ -83,7 +71,7 @@ export default function CarSearch({ onSearch }) {
         <div className="info-bar">
           <span>
             💰 ประมาณการ:{" "}
-            <strong>฿{totalEstimate.toLocaleString()}</strong>
+          
           </span>
         </div>
 

@@ -1,209 +1,159 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-import "../styles/admin-users.css";
-
-/* ===== MOCK USERS ===== */
-const mockUsers = [
-  {
-    id: 1,
-    name: "Admin One",
-    email: "admin@carrental.com",
-    role: "admin",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Somchai",
-    email: "somchai@gmail.com",
-    role: "user",
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "Somsri",
-    email: "somsri@gmail.com",
-    role: "user",
-    status: "blocked",
-  },
-];
+const API = import.meta.env.VITE_API_URL;
 
 export default function AdminUsers() {
-
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const navigate = useNavigate();
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({});
+  const token = localStorage.getItem("token");
 
-  /* ===== SEARCH ===== */
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchUsers() {
+    const res = await axios.get(`${API}/users`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setUsers(res.data);
+  }
+
+  async function updateUser() {
+    try {
+      await axios.put(
+        `${API}/users/${selectedUser.id}`,
+        form,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert("แก้ไขสำเร็จ");
+      fetchUsers();
+      setSelectedUser(null);
+      setEditMode(false);
+
+    } catch (err) {
+      alert(err.response?.data?.message || "แก้ไขไม่สำเร็จ");
+    }
+  }
+
+  async function deleteUser(id) {
+    if (!window.confirm("ลบผู้ใช้นี้?")) return;
+
+    await axios.delete(`${API}/users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    fetchUsers();
+  }
+
   const filteredUsers = users.filter((u) =>
-    `${u.name} ${u.email} ${u.role} ${u.status}`
+    `${u.username} ${u.name} ${u.surname}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
-
-  /* ===== ACTIONS ===== */
-  const toggleStatus = () => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === selectedUser.id
-          ? {
-            ...u,
-            status: u.status === "active" ? "blocked" : "active",
-          }
-          : u
-      )
-    );
-    setSelectedUser(null);
-  };
-
-  const deleteUser = () => {
-    if (!window.confirm("ลบผู้ใช้นี้หรือไม่?")) return;
-    setUsers((prev) =>
-      prev.filter((u) => u.id !== selectedUser.id)
-    );
-    setSelectedUser(null);
-  };
 
   return (
     <>
       <h1>จัดการผู้ใช้</h1>
 
-      {/* ===== TOOLBAR ===== */}
-      <div className="users-toolbar">
-        <input
-          type="text"
-          placeholder="🔍 ค้นหา ชื่อ / email / role / สถานะ"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <span className="count">
-          ทั้งหมด {filteredUsers.length} คน
-        </span>
-      </div>
+      <input
+        placeholder="ค้นหา"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      {/* ===== TABLE ===== */}
-      <div className="table-wrapper">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>ชื่อ</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>สถานะ</th>
-              <th>จัดการ</th>
+      <table border="1" cellPadding="8">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>ชื่อเต็ม</th>
+            <th>Role</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.map((u) => (
+            <tr key={u.id}>
+              <td>{u.username}</td>
+              <td>{u.name} {u.surname}</td>
+              <td>{u.role}</td>
+              <td>
+                <button
+                  onClick={() => {
+                    setSelectedUser(u);
+                    setForm({
+                      username: u.username || "",
+                      name: u.name || "",
+                      surname: u.surname || "",
+                      phone: u.phone || "",
+                      address: u.address || "",
+                      role: u.role || "USER",
+                    });
+                    setEditMode(false);
+                  }}
+                >
+                  ดู
+                </button>
+
+                <button onClick={() => deleteUser(u.id)}>
+                  ลบ
+                </button>
+              </td>
             </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
 
-          <tbody>
-            {filteredUsers.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="empty">
-                  ไม่พบข้อมูล
-                </td>
-              </tr>
-            ) : (
-              filteredUsers.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className={`role ${u.role}`}>
-                      {u.role}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${u.status === "active"
-                          ? "success"
-                          : "danger"
-                        }`}
-                    >
-                      {u.status}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      className="manage-btn"
-                      onClick={() => setSelectedUser(u)}
-                    >
-                      จัดการ
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ===== DIGITAL MODAL (MUI STYLE) ===== */}
       {selectedUser && (
-        <div
-          className="dialog-backdrop"
-          onClick={() => setSelectedUser(null)}
-        >
-          <div
-            className="dialog"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>จัดการผู้ใช้</h3>
-            <p className="dialog-user">
-              {selectedUser.name} ({selectedUser.email})
-            </p>
+        <div style={{ marginTop: 20, border: "1px solid #ccc", padding: 20 }}>
+          {editMode ? (
+            <>
+              <input value={form.name}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })} />
 
-            <div className="dialog-actions">
-              <button
-                onClick={() => {
-                  navigate(`/admin/users/${selectedUser.id}`);
-                  setSelectedUser(null);
-                }}
-              >
-                📄 รายละเอียดผู้ใช้
+              <input value={form.surname}
+                onChange={(e) =>
+                  setForm({ ...form, surname: e.target.value })} />
+
+              <input value={form.phone}
+                onChange={(e) =>
+                  setForm({ ...form, phone: e.target.value })} />
+
+              <input value={form.address}
+                onChange={(e) =>
+                  setForm({ ...form, address: e.target.value })} />
+
+              <select value={form.role}
+                onChange={(e) =>
+                  setForm({ ...form, role: e.target.value })}>
+                <option value="USER">USER</option>
+                <option value="ADMIN">ADMIN</option>
+              </select>
+
+              <button onClick={updateUser}>บันทึก</button>
+            </>
+          ) : (
+            <>
+              <p>ชื่อ: {selectedUser.name}</p>
+              <p>นามสกุล: {selectedUser.surname}</p>
+              <p>เบอร์โทร: {selectedUser.phone}</p>
+              <p>ที่อยู่: {selectedUser.address}</p>
+              <p>Role: {selectedUser.role}</p>
+
+              <button onClick={() => setEditMode(true)}>
+                แก้ไข
               </button>
+            </>
+          )}
 
-              <button onClick={toggleStatus}>
-                ⚙️{" "}
-                {selectedUser.status === "active"
-                  ? "ปิดใช้งาน"
-                  : "เปิดใช้งาน"}
-              </button>
-
-              <button
-  onClick={() => {
-    navigate(`/admin/users/${selectedUser.id}/edit`);
-    setSelectedUser(null);
-  }}
->
-  ✏️ แก้ไขข้อมูล
-</button>
-
-
-   <button
-  onClick={() => {
-    navigate(`/admin/users/${selectedUser.id}/bookings`);
-    setSelectedUser(null);
-  }}
->
-  📚 ประวัติการจอง
-</button>
-
-
-              <button
-                className="danger"
-                onClick={deleteUser}
-              >
-                🗑 ลบผู้ใช้
-              </button>
-            </div>
-
-            <button
-              className="dialog-close"
-              onClick={() => setSelectedUser(null)}
-            >
-              ปิด
-            </button>
-          </div>
+          <button onClick={() => setSelectedUser(null)}>
+            ปิด
+          </button>
         </div>
       )}
     </>

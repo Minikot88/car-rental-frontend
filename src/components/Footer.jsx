@@ -24,11 +24,10 @@ function Footer() {
 
           {/* LINKS */}
           <div className="footer-col">
-            <div className="footer-title">ลิงก์ด่วน</div>
             <ul className="footer-list">
+              <li><a href="/booking/1">หน้าแรก</a></li>
               <li><a href="/cars">รถทั้งหมด</a></li>
               <li><a href="/booking/1">จองรถ</a></li>
-              <li><a href="/profile">บัญชีของฉัน</a></li>
             </ul>
           </div>
 
@@ -49,7 +48,7 @@ function Footer() {
         <div className="footer-divider" />
 
         <p className="footer-copy">
-          © {new Date().getFullYear()} CarRental • All Rights Reserved
+          © {new Date().getFullYear()} Car • All Rights Reserved
         </p>
       </div>
     </footer>

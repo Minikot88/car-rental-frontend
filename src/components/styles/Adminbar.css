@@ -1,0 +1,158 @@
+/* ================= SUBNAV ================= */
+.subnav {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* ตรงกลางแนวนอน */
+  margin-top: 10px;
+}
+
+/* container กลางจริง */
+.subnav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+
+  padding: 10px 22px;
+  border-radius: 999px;
+
+  background: var(--card);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* ================= ITEM ================= */
+.subnav-item {
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text);
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+/* hover minimal */
+.subnav-item:hover {
+  color: var(--primary);
+}
+
+/* active underline */
+.subnav-item::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: var(--primary);
+  transition: all 0.25s ease;
+  transform: translateX(-50%);
+}
+
+.subnav-item:hover::after {
+  width: 60%;
+}
+
+.subnav-item.active {
+  color: var(--primary);
+}
+
+.subnav-item.active::after {
+  width: 80%;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .subnav-container {
+    gap: 16px;
+    padding: 8px 16px;
+  }
+
+  .subnav-item {
+    font-size: 0.85rem;
+  }
+}
+
+
+/* ================= SUBNAV ================= */
+.subnav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 0 12px;
+}
+
+.subnav-container {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+
+  padding: 10px 22px;
+  border-radius: 999px;
+
+  background: var(--card);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+
+  max-width: 100%;
+  overflow-x: auto;                 /* 🔥 เลื่อนแนวนอน */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ซ่อน scrollbar */
+.subnav-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================= ITEM ================= */
+.subnav-item {
+  flex: 0 0 auto;                    /* 🔥 สำคัญมาก */
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  position: relative;
+  transition: color 0.2s ease;
+  white-space: nowrap;               /* 🔥 กันตัดบรรทัด */
+}
+
+/* hover */
+.subnav-item:hover {
+  color: var(--primary);
+}
+
+/* underline animation */
+.subnav-item::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: var(--primary);
+  transition: all 0.25s ease;
+  transform: translateX(-50%);
+}
+
+.subnav-item:hover::after {
+  width: 60%;
+}
+
+.subnav-item.active {
+  color: var(--primary);
+}
+
+.subnav-item.active::after {
+  width: 80%;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .subnav-container {
+    gap: 16px;
+    padding: 8px 16px;
+  }
+
+  .subnav-item {
+    font-size: 0.85rem;
+  }
+}

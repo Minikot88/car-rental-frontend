@@ -1,46 +1,78 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../utils/api";
 import "./styles/Login.css";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
-    email: "",
+    phone: "",
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("LOGIN DATA:", form);
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      const res = await api.post("/auth/login", form);
+
+      const token = res.data?.accessToken;
+      if (!token) throw new Error("No token received");
+
+      // 🔥 เก็บ token
+      localStorage.setItem("token", token);
+
+      // 🔥 เก็บ role เผื่อใช้เช็ค frontend
+      localStorage.setItem("role", res.data.user.role);
+
+      // 🔥 ถ้า admin ไปหน้า admin
+      if (res.data.user.role === "ADMIN") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+        "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-page">
-      {/* ใส่ show ตรงนี้เลย */}
       <div className="auth-card show">
         <h2 className="auth-title">เข้าสู่ระบบ</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <span className="input-icon">📧</span>
             <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
+              type="text"
+              name="phone"
+              placeholder="เบอร์โทรศัพท์"
+              value={form.phone}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="input-group">
-            <span className="input-icon">🔒</span>
             <input
               type="password"
               name="password"
@@ -51,12 +83,12 @@ function Login() {
             />
           </div>
 
-          <button type="submit" className="auth-button">
-            เข้าสู่ระบบ
+          <button type="submit" disabled={loading}>
+            {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>
         </form>
 
-        <p className="auth-note">
+        <p>
           ยังไม่มีบัญชี? <Link to="/register">สมัครสมาชิก</Link>
         </p>
       </div>
