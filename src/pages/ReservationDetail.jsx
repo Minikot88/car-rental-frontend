@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-
-const API = import.meta.env.VITE_API_URL;
+import api from "@/utils/axios";
+import "./styles/ReservationDetail.css";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function ReservationDetail() {
   const { id } = useParams();
@@ -13,28 +14,58 @@ export default function ReservationDetail() {
   const [loading, setLoading] = useState(true);
 
   //////////////////////////////////////////////////////
+  // STATUS TEXT HELPERS
+  //////////////////////////////////////////////////////
+  const getBookingStatusText = (status) => {
+    const map = {
+      PENDING: "กำลังดำเนินการ",
+      WAITING_PAYMENT: "รอการชำระเงิน",
+      CONFIRMED: "ยืนยันการจองแล้ว",
+      CANCELLED: "ยกเลิกแล้ว",
+      EXPIRED: "หมดเวลา",
+      COMPLETED: "เสร็จสิ้น",
+    };
+    return map[status] || status;
+  };
+
+  const getPaymentStatusText = (status) => {
+    const map = {
+      PENDING: "รอการตรวจสอบ",
+      WAITING_PAYMENT: "รอการชำระเงิน",
+      PAID: "ชำระเงินแล้ว",
+      FAILED: "ชำระเงินไม่สำเร็จ",
+      REFUNDED: "คืนเงินแล้ว",
+    };
+    return map[status] || "-";
+  };
+
+  //////////////////////////////////////////////////////
   // FETCH RESERVATION
   //////////////////////////////////////////////////////
   useEffect(() => {
+    let mounted = true;
+
     async function fetchData() {
       try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(`${API}/reservations/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setReservation(res.data);
-
+        const res = await api.get(`/reservations/${id}`);
+        if (mounted) setReservation(res.data);
       } catch (err) {
-        console.error(err);
+        if (err.response?.status === 401) {
+          navigate("/login");
+        } else {
+          navigate("/carslist");
+        }
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
-    fetchData();
-  }, [id]);
+    if (id) fetchData();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id, navigate]);
 
   //////////////////////////////////////////////////////
   // COUNTDOWN
@@ -42,65 +73,175 @@ export default function ReservationDetail() {
   useEffect(() => {
     if (!reservation?.lockExpiresAt) return;
 
-    const expire = new Date(reservation.lockExpiresAt).getTime();
+    const expireTime = new Date(reservation.lockExpiresAt).getTime();
 
     const interval = setInterval(() => {
-      const diff = expire - Date.now();
+      const diff = expireTime - Date.now();
 
       if (diff <= 0) {
         clearInterval(interval);
-        navigate("/my-bookings");
+        setTimeLeft(0);
+
+        // Auto refresh page when expired
+        if (reservation.status === "WAITING_PAYMENT") {
+          navigate("/carslist");
+        }
       } else {
         setTimeLeft(diff);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [reservation, navigate]);
+  }, [reservation?.lockExpiresAt, reservation?.status, navigate]);
 
   const formatTime = (ms) => {
-    const m = Math.floor(ms / 60000);
-    const s = Math.floor((ms % 60000) / 1000);
-    return `${m}:${s.toString().padStart(2, "0")}`;
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  if (loading) return <p style={{ textAlign: "center" }}>กำลังโหลด...</p>;
-  if (!reservation) return <p>ไม่พบข้อมูล</p>;
+  //////////////////////////////////////////////////////
+  // DOWNLOAD PDF
+  //////////////////////////////////////////////////////
+  const downloadPDF = useCallback(async (type) => {
+    const element = document.getElementById("print-area");
+    if (!element) return;
+
+    try {
+      const canvas = await html2canvas(element, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const imgWidth = 190;
+      const imgHeight =
+        (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+
+      const filename =
+        type === "invoice"
+          ? `Invoice-BL-${reservation.id}.pdf`
+          : `Contract-BL-${reservation.id}.pdf`;
+
+      pdf.save(filename);
+    } catch (err) {
+      console.error("PDF Error:", err);
+    }
+  }, [reservation?.id]);
+
+  //////////////////////////////////////////////////////
+  // LOADING
+  //////////////////////////////////////////////////////
+  if (loading)
+    return <p style={{ textAlign: "center" }}>กำลังโหลด...</p>;
+
+  if (!reservation)
+    return <p style={{ textAlign: "center" }}>ไม่พบข้อมูล</p>;
 
   //////////////////////////////////////////////////////
   // UI
   //////////////////////////////////////////////////////
   return (
-    <div style={{ maxWidth: 900, margin: "40px auto" }}>
-      <h2>รายละเอียดใบจอง BL-{reservation.id}</h2>
+    <div className="reservation-page">
 
-      <div className="detail-card">
-        <p>
-          วันที่:{" "}
-          {new Date(reservation.startDate).toLocaleDateString("th-TH")} →{" "}
-          {new Date(reservation.endDate).toLocaleDateString("th-TH")}
-        </p>
-        <p>ยอดรวม: ฿{reservation.totalPrice.toLocaleString()}</p>
-        <p>สถานะ: {reservation.status}</p>
-        <p>Payment: {reservation.payment?.status || "-"}</p>
+      <div id="print-area">
+
+        <h2 className="reservation-title">
+          รายละเอียดใบจอง
+          <span>BL-{reservation.id}</span>
+        </h2>
+
+        <div className="reservation-grid">
+
+          {/* SUMMARY */}
+          <div className="detail-card main">
+
+            <div className="detail-row">
+              <span>วันที่เช่า</span>
+              <strong>
+                {new Date(reservation.startDate)
+                  .toLocaleDateString("th-TH")}
+                {" → "}
+                {new Date(reservation.endDate)
+                  .toLocaleDateString("th-TH")}
+              </strong>
+            </div>
+
+            <div className="detail-row">
+              <span>ยอดรวม</span>
+              <strong className="price">
+                ฿{reservation.totalPrice.toLocaleString()}
+              </strong>
+            </div>
+
+            <div className="detail-row">
+              <span>สถานะการจอง</span>
+              <span
+                className={`status-badge status-${reservation.status}`}
+              >
+                {getBookingStatusText(reservation.status)}
+              </span>
+            </div>
+
+            <div className="detail-row">
+              <span>สถานะการชำระเงิน</span>
+              <strong>
+                {getPaymentStatusText(reservation.payment?.status)}
+              </strong>
+            </div>
+
+          </div>
+
+          {/* PAYMENT BOX */}
+          {["PENDING", "WAITING_PAYMENT"].includes(
+            reservation.status
+          ) && (
+            <div className="detail-card payment-box">
+
+              <h3>รอการชำระเงิน</h3>
+
+              <div className="countdown">
+                ⏳ เวลาคงเหลือ
+                <span>
+                  {timeLeft > 0
+                    ? formatTime(timeLeft)
+                    : "หมดเวลาแล้ว"}
+                </span>
+              </div>
+
+              <Link
+                to={`/payment/${reservation.id}`}
+                className="btn-pay"
+              >
+                ไปหน้าชำระเงิน
+              </Link>
+
+            </div>
+          )}
+
+        </div>
       </div>
 
-      {["PENDING", "WAITING_PAYMENT"].includes(reservation.status) && (
-        <div className="detail-card">
-          <h3>รอชำระเงิน</h3>
+      {/* ACTIONS */}
+      <div className="reservation-actions">
 
-          <h2 style={{ color: "red" }}>
-            เวลาคงเหลือ: {formatTime(timeLeft)}
-          </h2>
+        <button
+          onClick={() => downloadPDF("invoice")}
+          className="btn-outline"
+        >
+          🧾 ดาวน์โหลดใบแจ้งหนี้
+        </button>
 
-          <Link
-            to={`/payment/${reservation.id}`}
-            className="btn-primary"
-          >
-            ไปหน้าชำระเงิน
-          </Link>
-        </div>
-      )}
+        <button
+          onClick={() => downloadPDF("contract")}
+          className="btn-outline"
+        >
+          📄 ดาวน์โหลดสัญญาเช่า
+        </button>
+
+      </div>
+
     </div>
   );
 }

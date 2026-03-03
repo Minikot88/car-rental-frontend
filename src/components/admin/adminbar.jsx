@@ -1,67 +1,67 @@
-import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 import "../styles/Adminbar.css";
 
-const API = import.meta.env.VITE_API_URL;
-
 export default function Adminbar() {
-  const token = localStorage.getItem("token");
-  const [role, setRole] = useState(null);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    if (!token) return;
+  // รอโหลด user ก่อน
+  if (loading) return null;
 
-    let isMounted = true;
+  // ไม่ใช่ admin → ไม่แสดง
+  if (user?.role !== "ADMIN") return null;
 
-    const fetchUser = async () => {
-      try {
-        const { data } = await axios.get(`${API}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  return (
+    <div className="subnav">
+      <div className="subnav-container">
 
-        if (isMounted) setRole(data.role);
-      } catch {
-        if (isMounted) setRole(null);
-      }
-    };
+        <NavLink
+          to="/admin/operations"
+          className={({ isActive }) =>
+            `subnav-item ${isActive ? "active" : ""}`
+          }
+        >
+          Control Center
+        </NavLink>
 
-    fetchUser();
+        <NavLink
+          to="/admin"
+          end
+          className={({ isActive }) =>
+            `subnav-item ${isActive ? "active" : ""}`
+          }
+        >
+          Dashboard
+        </NavLink>
 
-    return () => {
-      isMounted = false;
-    };
-  }, [token]);
+        <NavLink
+          to="/admin/bookings"
+          className={({ isActive }) =>
+            `subnav-item ${isActive ? "active" : ""}`
+          }
+        >
+          การจอง
+        </NavLink>
 
-  if (role !== "ADMIN") return null;
+        <NavLink
+          to="/admin/cars"
+          className={({ isActive }) =>
+            `subnav-item ${isActive ? "active" : ""}`
+          }
+        >
+          รถ
+        </NavLink>
 
-return (
-  <div className="subnav">
-    <div className="subnav-container">
-      <NavLink to="/admin/operations" className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        Control Center
-      </NavLink>
+        <NavLink
+          to="/admin/users"
+          className={({ isActive }) =>
+            `subnav-item ${isActive ? "active" : ""}`
+          }
+        >
+          ผู้ใช้
+        </NavLink>
 
-      <NavLink to="/admin" end className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        Dashboard
-      </NavLink>
-
-      <NavLink to="/admin/bookings" className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        การจอง
-      </NavLink>
-
-      <NavLink to="/admin/cars" className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        รถ
-      </NavLink>
-
-      <NavLink to="/admin/users" className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        ผู้ใช้
-      </NavLink>
-
-      <NavLink to="/admin/settings" className={({ isActive }) => `subnav-item ${isActive ? "active" : ""}`}>
-        ตั้งค่า
-      </NavLink>
+      </div>
     </div>
-  </div>
-);
+  );
 }

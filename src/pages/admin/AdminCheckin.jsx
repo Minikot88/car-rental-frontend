@@ -1,61 +1,117 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-
-const API = import.meta.env.VITE_API_URL;
+import api from "@/utils/axios";
+import {
+  SwalSuccess,
+  SwalError,
+  SwalConfirm,
+} from "@/utils/swal";
 
 export default function AdminCheckin() {
-  const [reservations, setReservations] = useState([]);
+   const [reservations, setReservations] = useState([]);
   const [selected, setSelected] = useState(null);
   const [mode, setMode] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     mileageBefore: "",
     mileageAfter: "",
     fuelLevel: "",
     fuelFull: true,
-    damageCost: 0
+    damageCost: 0,
   });
+
+  //////////////////////////////////////////////////////
+  // FETCH
+  //////////////////////////////////////////////////////
+  const fetchReservations = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/reservations", {
+        skipLoading: true,
+      });
+      setReservations(res.data || []);
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "โหลดข้อมูลไม่สำเร็จ" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchReservations();
   }, []);
 
-  async function fetchReservations() {
-    const res = await axios.get(`${API}/reservations`);
-    setReservations(res.data);
-  }
+  //////////////////////////////////////////////////////
+  // CHECKIN
+  //////////////////////////////////////////////////////
+  const handleCheckin = async () => {
+    if (!form.mileageBefore || !form.fuelLevel) {
+      SwalError({ title: "กรอกข้อมูลให้ครบ" });
+      return;
+    }
 
-  async function handleCheckin() {
-    await axios.post(
-      `${API}/checkin/checkin/${selected.id}`,
-      {
-        mileageBefore: form.mileageBefore,
-        fuelLevel: form.fuelLevel
-      }
-    );
+    const confirm = await SwalConfirm({
+      title: "ยืนยัน Check-in ?",
+    });
 
-    alert("Check-in สำเร็จ");
-    setSelected(null);
-    fetchReservations();
-  }
+    if (!confirm.isConfirmed) return;
 
-  async function handleCheckout() {
-    const res = await axios.post(
-      `${API}/checkin/checkout/${selected.id}`,
-      {
-        mileageAfter: form.mileageAfter,
-        fuelFull: form.fuelFull,
-        damageCost: form.damageCost
-      }
-    );
+    try {
+      await api.post(
+        `/checkin/checkin/${selected.id}`,
+        {
+          mileageBefore: Number(form.mileageBefore),
+          fuelLevel: form.fuelLevel,
+        }
+      );
 
-    alert(
-      `Checkout สำเร็จ\nค่าปรับ: ฿${res.data.fine}\nยอดรวมใหม่: ฿${res.data.finalTotal}`
-    );
+      SwalSuccess({ title: "Check-in สำเร็จ" });
+      setSelected(null);
+      fetchReservations();
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "Check-in ไม่สำเร็จ" });
+    }
+  };
 
-    setSelected(null);
-    fetchReservations();
-  }
+  //////////////////////////////////////////////////////
+  // CHECKOUT
+  //////////////////////////////////////////////////////
+  const handleCheckout = async () => {
+    if (!form.mileageAfter) {
+      SwalError({ title: "กรอกเลขไมล์หลังคืนรถ" });
+      return;
+    }
+
+    const confirm = await SwalConfirm({
+      title: "ยืนยัน Check-out ?",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await api.post(
+        `/checkin/checkout/${selected.id}`,
+        {
+          mileageAfter: Number(form.mileageAfter),
+          fuelFull: form.fuelFull,
+          damageCost: Number(form.damageCost),
+        }
+      );
+
+      SwalSuccess({
+        title: `ค่าปรับ ฿${res.data.fine}`,
+        text: `ยอดรวมใหม่ ฿${res.data.finalTotal}`,
+      });
+
+      setSelected(null);
+      fetchReservations();
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "Check-out ไม่สำเร็จ" });
+    }
+  };
 
   return (
     <>
@@ -75,8 +131,8 @@ export default function AdminCheckin() {
           {reservations.map((r) => (
             <tr key={r.id}>
               <td>{r.id}</td>
-              <td>{r.userId}</td>
-              <td>{r.carId}</td>
+             <td>{r.user?.name} {r.user?.surname}</td>
+<td>{r.car?.name}</td>
               <td>{r.status}</td>
               <td>
                 <button onClick={() => {

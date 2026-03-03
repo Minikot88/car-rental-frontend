@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import Swal from "sweetalert2";
+import api from "@/utils/axios";
+import { SwalConfirm, SwalSuccess, SwalError } from "@/utils/swal";
 import "../styles/admin-cars.css";
 
 const API = import.meta.env.VITE_API_URL;
 
 export default function AdminCars() {
-  const [cars, setCars] = useState([]);
+ const [cars, setCars] = useState([]);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,100 +20,95 @@ export default function AdminCars() {
 
   const [form, setForm] = useState(emptyForm);
 
-  /* ================= FETCH ================= */
-
-  useEffect(() => {
-    fetchCars();
-  }, []);
-
+   //////////////////////////////////////////////////////
+  // FETCH
+  //////////////////////////////////////////////////////
   const fetchCars = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/cars`);
-      setCars(res.data);
-    } catch {
-      Swal.fire("Error", "โหลดรถไม่สำเร็จ", "error");
+
+      const res = await api.get("/cars", {
+        skipLoading: true,
+      });
+
+      setCars(res.data || []);
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "โหลดรถไม่สำเร็จ" });
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= ACTIONS ================= */
+  useEffect(() => {
+    fetchCars();
+  }, []);
 
+  //////////////////////////////////////////////////////
+  // OPEN MODAL
+  //////////////////////////////////////////////////////
   const openAdd = () => {
     setForm(emptyForm);
     setEditing({});
   };
 
   const openEdit = (car) => {
-    setForm(car);
+    setForm({
+      name: car.name || "",
+      brand: car.brand || "",
+      model: car.model || "",
+      pricePerDay: car.pricePerDay || "",
+      description: car.description || "",
+    });
     setEditing(car);
   };
 
+ //////////////////////////////////////////////////////
+  // SAVE
+  //////////////////////////////////////////////////////
   const saveCar = async () => {
+    if (!form.name || !form.brand || !form.model || !form.pricePerDay) {
+      SwalError({ title: "กรุณากรอกข้อมูลให้ครบ" });
+      return;
+    }
+
     try {
       if (editing?.id) {
-        await axios.put(`${API}/cars/${editing.id}`, form);
+        await api.put(`/cars/${editing.id}`, form);
       } else {
-        await axios.post(`${API}/cars`, form);
+        await api.post("/cars", form);
       }
 
       await fetchCars();
       setEditing(null);
+      SwalSuccess({ title: "บันทึกสำเร็จ" });
 
-      Swal.fire({
-        icon: "success",
-        title: "บันทึกสำเร็จ",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    } catch {
-      Swal.fire("ผิดพลาด", "บันทึกไม่สำเร็จ", "error");
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "บันทึกไม่สำเร็จ" });
     }
   };
 
+  //////////////////////////////////////////////////////
+  // DELETE
+  //////////////////////////////////////////////////////
   const deleteCar = async (id) => {
-  const result = await Swal.fire({
-    title: "ยืนยันการลบ?",
-    text: "ลบแล้วจะไม่สามารถกู้คืนได้",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#e10600",
-    cancelButtonText: "ยกเลิก",
-    confirmButtonText: "ลบ",
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    // แสดง loading ระหว่างลบ
-    Swal.fire({
-      title: "กำลังลบ...",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+    const confirm = await SwalConfirm({
+      title: "ยืนยันการลบ?",
+      text: "ลบแล้วจะไม่สามารถกู้คืนได้",
     });
 
-    await axios.delete(`${API}/cars/${id}`);
-    await fetchCars();
+    if (!confirm.isConfirmed) return;
 
-    Swal.fire({
-      icon: "success",
-      title: "ลบสำเร็จ",
-      text: "รายการรถถูกลบเรียบร้อยแล้ว",
-      timer: 1600,
-      showConfirmButton: false,
-    });
-
-  } catch {
-    Swal.fire({
-      icon: "error",
-      title: "ลบไม่สำเร็จ",
-      text: "เกิดข้อผิดพลาดในการลบ",
-    });
-  }
-};
+    try {
+      await api.delete(`/cars/${id}`);
+      await fetchCars();
+      SwalSuccess({ title: "ลบสำเร็จ" });
+    } catch (err) {
+      console.error(err);
+      SwalError({ title: "ลบไม่สำเร็จ" });
+    }
+  };
 
   /* ================= UI ================= */
 
@@ -156,8 +151,6 @@ export default function AdminCars() {
                   <span>/วัน</span>
                 </div>
               </div>
-
-              <p className="car-desc">{c.description}</p>
 
               <div className="car-actions">
                 <button

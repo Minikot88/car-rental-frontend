@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/utils/axios";
 import { useNavigate } from "react-router-dom";
+import { SwalError, SwalSuccess } from "@/utils/swal";
 import "../styles/admin-operations.css";
-
-const API = import.meta.env.VITE_API_URL;
 
 export default function AdminOperations() {
   const [data, setData] = useState([]);
@@ -26,20 +25,15 @@ export default function AdminOperations() {
   // FETCH DATA
   //////////////////////////////////////////////////////
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchData(token);
-  }, [navigate]);
+    fetchData();
+  }, []);
 
-  async function fetchData(token) {
+  async function fetchData() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API}/operations/today`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.get("/operations/today", {
+        skipLoading: true,
       });
 
       const filtered = (res.data || []).filter((r) => {
@@ -57,7 +51,8 @@ export default function AdminOperations() {
       );
 
       setData(filtered);
-    } catch {
+    } catch (err) {
+      console.error("OPS ERROR:", err);
       navigate("/login");
     } finally {
       setLoading(false);
@@ -75,11 +70,11 @@ export default function AdminOperations() {
     return new Date(dateString);
   }
 
-  function isSameDay(date1, date2) {
+  function isSameDay(d1, d2) {
     return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
     );
   }
 
@@ -108,54 +103,42 @@ export default function AdminOperations() {
   }
 
   //////////////////////////////////////////////////////
-  // STATUS BADGE
-  //////////////////////////////////////////////////////
-  function getStatusBadge(r) {
-    const isInUse =
-      r.checkinCheckout?.checkInTime &&
-      !r.checkinCheckout?.checkOutTime;
-
-    if (isInUse)
-      return <span className="badge inuse">กำลังใช้งาน</span>;
-
-    return <span className="badge waiting">รอรับรถ</span>;
-  }
-
-  //////////////////////////////////////////////////////
   // ACTIONS
   //////////////////////////////////////////////////////
   const handleCheckin = async (id) => {
-    const token = localStorage.getItem("token");
-    setActionLoading(id);
+    try {
+      setActionLoading(id);
 
-    await axios.post(
-      `${API}/operations/${id}/checkin`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      await api.post(`/operations/${id}/checkin`);
 
-    await fetchData(token);
-    setActionLoading(null);
+      SwalSuccess({ title: "Check-in สำเร็จ" });
+      await fetchData();
+    } catch {
+      SwalError({ title: "Check-in ไม่สำเร็จ" });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleCheckout = async (id) => {
-    const token = localStorage.getItem("token");
-    setActionLoading(id);
+    try {
+      setActionLoading(id);
 
-    await axios.post(
-      `${API}/operations/${id}/checkout`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      await api.post(`/operations/${id}/checkout`);
 
-    await fetchData(token);
-    setActionLoading(null);
+      SwalSuccess({ title: "Check-out สำเร็จ" });
+      await fetchData();
+    } catch {
+      SwalError({ title: "Check-out ไม่สำเร็จ" });
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   if (loading) return <p>กำลังโหลด...</p>;
 
   //////////////////////////////////////////////////////
-  // SUMMARY CALCULATIONS
+  // SUMMARY
   //////////////////////////////////////////////////////
   const today = new Date();
 
@@ -169,16 +152,6 @@ export default function AdminOperations() {
     return returnDate && isSameDay(returnDate, today);
   }).length;
 
-  const checkinTomorrow = data.filter((r) => {
-    const pickup = parseDate(r.pickupTime);
-    return pickup && isTomorrow(pickup);
-  }).length;
-
-  const checkoutTomorrow = data.filter((r) => {
-    const returnDate = parseDate(r.returnTime);
-    return returnDate && isTomorrow(returnDate);
-  }).length;
-
   const carsInUseNow = data.filter(
     (r) =>
       r.checkinCheckout?.checkInTime &&
@@ -186,22 +159,19 @@ export default function AdminOperations() {
   ).length;
 
   //////////////////////////////////////////////////////
-  // RENDER
+  // UI
   //////////////////////////////////////////////////////
   return (
     <div className="operations-container container">
 
-      {/* HEADER */}
       <div className="ops-header">
         <h1>Today Operations</h1>
-
         <div className="ops-live-kpi">
           🚗 กำลังใช้งานตอนนี้
           <strong>{carsInUseNow}</strong>
         </div>
       </div>
 
-      {/* SUMMARY */}
       <div className="ops-summary">
         <div className="ops-card-summary">
           <span>Check-in วันนี้</span>
@@ -212,19 +182,8 @@ export default function AdminOperations() {
           <span>Check-out วันนี้</span>
           <strong>{checkoutToday}</strong>
         </div>
-
-        <div className="ops-card-summary">
-          <span>Check-in พรุ่งนี้</span>
-          <strong>{checkinTomorrow}</strong>
-        </div>
-
-        <div className="ops-card-summary">
-          <span>Check-out พรุ่งนี้</span>
-          <strong>{checkoutTomorrow}</strong>
-        </div>
       </div>
 
-      {/* TABLE (DESKTOP) */}
       <div className="ops-table-wrapper">
         <table className="ops-table">
           <thead>
@@ -233,7 +192,6 @@ export default function AdminOperations() {
               <th>รถ</th>
               <th>เวลา</th>
               <th>Countdown</th>
-              <th>สถานะ</th>
               <th>จัดการ</th>
             </tr>
           </thead>
@@ -241,7 +199,7 @@ export default function AdminOperations() {
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan="6" className="empty">
+                <td colSpan="5" className="empty">
                   ไม่มีรายการวันนี้
                 </td>
               </tr>
@@ -264,29 +222,24 @@ export default function AdminOperations() {
                     <td className="countdown">
                       {getCountdown(r.pickupTime)}
                     </td>
-                    <td>{getStatusBadge(r)}</td>
                     <td>
-                      <div className="table-actions">
-                        {!isInUse && (
-                          <button
-                            className="btn checkin"
-                            disabled={actionLoading === r.id}
-                            onClick={() => handleCheckin(r.id)}
-                          >
-                            Check-in
-                          </button>
-                        )}
-
-                        {isInUse && (
-                          <button
-                            className="btn checkout"
-                            disabled={actionLoading === r.id}
-                            onClick={() => handleCheckout(r.id)}
-                          >
-                            Check-out
-                          </button>
-                        )}
-                      </div>
+                      {!isInUse ? (
+                        <button
+                          className="btn checkin"
+                          disabled={actionLoading === r.id}
+                          onClick={() => handleCheckin(r.id)}
+                        >
+                          Check-in
+                        </button>
+                      ) : (
+                        <button
+                          className="btn checkout"
+                          disabled={actionLoading === r.id}
+                          onClick={() => handleCheckout(r.id)}
+                        >
+                          Check-out
+                        </button>
+                      )}
                     </td>
                   </tr>
                 );
@@ -294,60 +247,6 @@ export default function AdminOperations() {
             )}
           </tbody>
         </table>
-      </div>
-
-      {/* MOBILE CARDS */}
-      <div className="ops-mobile">
-        {data.map((r) => {
-          const pickup = parseDate(r.pickupTime);
-          const isInUse =
-            r.checkinCheckout?.checkInTime &&
-            !r.checkinCheckout?.checkOutTime;
-
-          return (
-            <div className="ops-card" key={r.id}>
-              <div className="ops-card-header">
-                <h3>{r.user?.name}</h3>
-                {getStatusBadge(r)}
-              </div>
-
-              <div className="ops-card-body">
-                <p><strong>รถ:</strong> {r.car?.name}</p>
-                <p>
-                  <strong>เวลา:</strong>{" "}
-                  {pickup
-                    ? pickup.toLocaleTimeString("th-TH")
-                    : "-"}
-                </p>
-                <p className="countdown">
-                  {getCountdown(r.pickupTime)}
-                </p>
-              </div>
-
-              <div className="ops-card-actions">
-                {!isInUse && (
-                  <button
-                    className="btn checkin"
-                    disabled={actionLoading === r.id}
-                    onClick={() => handleCheckin(r.id)}
-                  >
-                    Check-in
-                  </button>
-                )}
-
-                {isInUse && (
-                  <button
-                    className="btn checkout"
-                    disabled={actionLoading === r.id}
-                    onClick={() => handleCheckout(r.id)}
-                  >
-                    Check-out
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

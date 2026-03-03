@@ -1,50 +1,68 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
-const API = import.meta.env.VITE_API_URL;
+import { useAuth } from "@/context/AuthContext";
+import "./styles/Profile.css";
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    async function fetchProfile() {
-      try {
-        const res = await axios.get(`${API}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setUser(res.data);
-      } catch (err) {
-        console.error(err);
-        navigate("/login");
-      }
-    }
-
-    fetchProfile();
-  }, [navigate]);
-
-  if (!user) return <p>กำลังโหลด...</p>;
-
-  return (
-    <div style={{ maxWidth: 600, margin: "40px auto" }}>
-      <h2>ข้อมูลโปรไฟล์</h2>
-
-      <div style={{ marginTop: 20 }}>
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>ชื่อ:</strong> {user.name}</p>
-        <p><strong>นามสกุล:</strong> {user.surname}</p>
-        <p><strong>เบอร์โทร:</strong> {user.phone}</p>
-        <p><strong>ที่อยู่:</strong> {user.address}</p>
+  //////////////////////////////////////////////////////
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <div className="profile-card profile-glass text-center">
+          <div className="ultra-spinner" />
+          <p className="muted">กำลังโหลดข้อมูล...</p>
+        </div>
       </div>
+    );
+  }
+
+  if (!user) {
+    return null; // ให้ ProtectedRoute จัดการ redirect
+  }
+
+  //////////////////////////////////////////////////////
+  return (
+    <div className="profile-page ultra-fade">
+
+      {/* HEADER */}
+      <div className="ultra-header">
+        <div className="ultra-avatar">
+          {user.username?.charAt(0).toUpperCase()}
+        </div>
+
+        <div>
+          <h2 className="ultra-username">{user.username}</h2>
+          <div className="ultra-badge">
+            {user.role === "ADMIN"
+              ? "Administrator"
+              : "Verified Member"}
+          </div>
+        </div>
+      </div>
+
+      {/* CARD */}
+      <div className="profile-card profile-glass ultra-border-glow">
+        <div className="profile-grid">
+
+          <Item label="ชื่อ" value={user.name} />
+          <Item label="นามสกุล" value={user.surname} />
+          <Item label="เบอร์โทร" value={user.phone} />
+          <Item label="ที่อยู่" value={user.address} full />
+
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+function Item({ label, value, full }) {
+  return (
+    <div className={`ultra-item ${full ? "full" : ""}`}>
+      <span className="ultra-label">{label}</span>
+      <span className="ultra-value">
+        {value || "-"}
+      </span>
     </div>
   );
 }

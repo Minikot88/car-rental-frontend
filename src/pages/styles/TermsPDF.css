@@ -1,0 +1,61 @@
+.pdf-wrapper {
+  background: #f4f5f7;
+  padding: 40px 0;
+}
+
+.pdf-container {
+  width: 210mm;
+  min-height: 297mm;
+  margin: auto;
+  background: #fff;
+  padding: 25mm;
+  font-family: "TH Sarabun New", "IBM Plex Sans Thai", sans-serif;
+  color: #000;
+  line-height: 1.8;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.pdf-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.pdf-header img {
+  width: 90px;
+}
+
+.pdf-header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.pdf-header h2 {
+  margin: 4px 0;
+  font-size: 18px;
+}
+
+.pdf-divider {
+  height: 2px;
+  background: #000;
+  margin: 20px 0 30px;
+}
+
+.pdf-content h3 {
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+
+.pdf-content p {
+  margin: 4px 0;
+  font-size: 16px;
+}
+
+.pdf-footer {
+  margin-top: 50px;
+  border-top: 1px solid #000;
+  padding-top: 10px;
+  text-align: center;
+  font-size: 14px;
+}

@@ -1,0 +1,230 @@
+/* =========================================================
+   ULTIMATE UI SYSTEM — SWEETALERT ENTERPRISE v2
+   Fully Responsive | Glass | Dark Mode | Mobile Ready
+   ========================================================= */
+
+/* ===============================================
+   BASE POPUP
+=============================================== */
+
+.my-swal {
+  border-radius: 22px !important;
+  padding: 28px !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: var(--card) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.25s ease;
+}
+
+/* Dark mode enhancement */
+[data-theme="dark"] .my-swal {
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+/* ===============================================
+   TITLE / TEXT
+=============================================== */
+
+.my-swal .swal2-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.my-swal .swal2-html-container {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+/* ===============================================
+   ACTIONS LAYOUT (ซ้าย–ขวาเต็ม)
+=============================================== */
+
+.my-swal .swal2-actions {
+  display: flex !important;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  margin-top: 28px;
+}
+
+.my-swal .swal2-actions button {
+  flex: 1;
+}
+
+/* ===============================================
+   PRIMARY CONFIRM
+=============================================== */
+
+.my-swal-confirm {
+  background: linear-gradient(
+    135deg,
+    var(--primary-light),
+    var(--primary)
+  );
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.my-swal-confirm:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* ===============================================
+   DANGER BUTTON
+=============================================== */
+
+.my-swal-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.my-swal-danger:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* ===============================================
+   CANCEL BUTTON
+=============================================== */
+
+.my-swal-cancel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.my-swal-cancel:hover {
+  background: var(--bg-soft);
+}
+
+/* ===============================================
+   TOAST (STACK READY)
+=============================================== */
+
+.my-swal-toast {
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  backdrop-filter: blur(14px);
+  background: var(--card) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow-md);
+  animation: toastSlide 0.3s ease;
+}
+
+@keyframes toastSlide {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ===============================================
+   LOADING STATE
+=============================================== */
+
+.my-swal .swal2-loader {
+  border-color: var(--primary) transparent var(--primary) transparent;
+}
+
+/* ===============================================
+   BOTTOM SHEET (MOBILE)
+=============================================== */
+
+.my-swal-sheet {
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 24px 24px 0 0 !important;
+  position: fixed !important;
+  bottom: 0;
+  margin: 0 !important;
+  animation: sheetUp 0.3s ease forwards;
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Desktop fallback */
+@media (min-width: 769px) {
+  .my-swal-sheet {
+    position: relative !important;
+    border-radius: 22px !important;
+  }
+}
+
+/* ===============================================
+   FULLSCREEN MOBILE
+=============================================== */
+
+@media (max-width: 768px) {
+  .my-swal-full {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* ===============================================
+   RESPONSIVE TYPOGRAPHY
+=============================================== */
+
+@media (max-width: 480px) {
+  .my-swal .swal2-title {
+    font-size: 18px;
+  }
+
+  .my-swal-confirm,
+  .my-swal-danger,
+  .my-swal-cancel {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+
+/* ===============================================
+   ENTERPRISE ANIMATION POLISH
+=============================================== */
+
+.my-swal.swal2-show {
+  animation: fadeInScale 0.25s ease;
+}
+
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===============================================
+   BACKDROP GLASS
+=============================================== */
+
+.swal2-backdrop-show {
+  backdrop-filter: blur(8px);
+}

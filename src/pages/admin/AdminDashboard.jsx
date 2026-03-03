@@ -1,30 +1,29 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/utils/axios";
+import { SwalError } from "@/utils/swal";
 import StatCard from "../../components/admin/StatCard";
 import DataTable from "../../components/admin/DataTable";
 import RevenueChart from "../../components/admin/RevenueChart";
 import "../styles/admin-dashboard.css";
 
-const API = import.meta.env.VITE_API_URL;
-
 export default function AdminDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
+  //////////////////////////////////////////////////////
+  // FETCH
+  //////////////////////////////////////////////////////
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        const res = await axios.get(`${API}/admin/analytics`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await api.get("/admin/analytics", {
+          skipLoading: true,
         });
 
         setData(res.data);
       } catch (err) {
         console.error("DASHBOARD ERROR:", err);
-        setError("ไม่สามารถโหลดข้อมูล Dashboard ได้");
+        SwalError({ title: "โหลดข้อมูล Dashboard ไม่สำเร็จ" });
       } finally {
         setLoading(false);
       }
@@ -33,29 +32,28 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  /* ================= LOADING ================= */
+  //////////////////////////////////////////////////////
+  // LOADING
+  //////////////////////////////////////////////////////
   if (loading) {
     return (
-      <div style={{ padding: "40px 0" }}>
-        <p>⏳ กำลังโหลดข้อมูล...</p>
-      </div>
-    );
-  }
-
-  /* ================= ERROR ================= */
-  if (error) {
-    return (
-      <div style={{ padding: "40px 0", color: "red" }}>
-        <p>{error}</p>
+      <div className="dashboard-loading">
+        ⏳ กำลังโหลดข้อมูล...
       </div>
     );
   }
 
   if (!data) {
-    return <p style={{ padding: "40px 0" }}>ไม่มีข้อมูล</p>;
+    return (
+      <div className="dashboard-empty">
+        ไม่มีข้อมูล
+      </div>
+    );
   }
 
-  /* ================= DESTRUCTURE DATA ================= */
+  //////////////////////////////////////////////////////
+  // DESTRUCTURE
+  //////////////////////////////////////////////////////
   const {
     kpiSummary = [],
     bookingStats = {},
@@ -64,9 +62,11 @@ export default function AdminDashboard() {
     revenueMonthly = [],
   } = data;
 
+  //////////////////////////////////////////////////////
+  // UI
+  //////////////////////////////////////////////////////
   return (
     <>
-      {/* ================= HEADER ================= */}
       <div className="dashboard-header">
         <h1>📊 Dashboard วิเคราะห์ระบบ</h1>
         <p className="dashboard-subtitle">
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* ================= KPI SUMMARY ================= */}
+      {/* KPI */}
       <section className="section">
         <h2>ภาพรวมระบบ</h2>
 
@@ -85,8 +85,7 @@ export default function AdminDashboard() {
               title={kpi.title}
               value={
                 typeof kpi.value === "number"
-                  ? kpi.title.includes("รายได้") ||
-                    kpi.title.includes("รายรับ")
+                  ? kpi.title.includes("รายได้")
                     ? `฿${kpi.value.toLocaleString()}`
                     : kpi.value.toLocaleString()
                   : kpi.value
@@ -96,48 +95,35 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* ================= BOOKING ================= */}
+      {/* BOOKING */}
       <section className="section">
         <h2>สถิติการจอง</h2>
 
         <div className="analytics-grid">
           <StatCard title="วันนี้" value={bookingStats.today ?? 0} />
-          <StatCard
-            title="7 วันล่าสุด"
-            value={bookingStats.thisWeek ?? 0}
-          />
-          <StatCard
-            title="เดือนนี้"
-            value={bookingStats.thisMonth ?? 0}
-          />
-          <StatCard
-            title="ยกเลิก"
-            value={bookingStats.canceled ?? 0}
-          />
+          <StatCard title="7 วันล่าสุด" value={bookingStats.thisWeek ?? 0} />
+          <StatCard title="เดือนนี้" value={bookingStats.thisMonth ?? 0} />
+          <StatCard title="ยกเลิก" value={bookingStats.canceled ?? 0} />
         </div>
       </section>
 
-      {/* ================= PAYMENT ================= */}
+      {/* PAYMENT */}
       <section className="section">
         <h2>การเงิน</h2>
 
         <div className="analytics-grid">
           <StatCard
             title="ชำระแล้ว"
-            value={`฿${Number(
-              paymentStats.paidAmount ?? 0
-            ).toLocaleString()}`}
+            value={`฿${Number(paymentStats.paidAmount ?? 0).toLocaleString()}`}
           />
           <StatCard
             title="ค้างชำระ"
-            value={`฿${Number(
-              paymentStats.pendingAmount ?? 0
-            ).toLocaleString()}`}
+            value={`฿${Number(paymentStats.pendingAmount ?? 0).toLocaleString()}`}
           />
         </div>
       </section>
 
-      {/* ================= REVENUE 7 DAYS ================= */}
+      {/* REVENUE 7 DAYS */}
       <section className="section">
         <h2>รายได้ 7 วันล่าสุด</h2>
 
@@ -150,7 +136,7 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* ================= MONTHLY REVENUE ================= */}
+      {/* MONTHLY */}
       <section className="section">
         <h2>รายได้รายเดือน</h2>
 

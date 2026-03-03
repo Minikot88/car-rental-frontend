@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useMemo } from "react";
+import api from "@/utils/api";
 import { useNavigate } from "react-router-dom";
+import {
+  SwalConfirm,
+  SwalSuccess,
+  SwalError,
+  SwalDanger,
+  SwalToast
+} from "@/utils/swal";
+import { motion, AnimatePresence } from "framer-motion";
+import "./styles/MyBookings.css";
 
 const API = import.meta.env.VITE_API_URL;
 
 //////////////////////////////////////////////////////////
-// BUSINESS LOGIC
+// BUSINESS LOGIC (ห้ามแก้)
 //////////////////////////////////////////////////////////
 
 function normalizeDate(d) {
@@ -33,6 +42,7 @@ function getStatusText(b) {
   if (b.status === "CANCELLED") return "ยกเลิกแล้ว";
   if (b.status === "EXPIRED") return "หมดเวลาชำระ";
   if (b.status === "WAITING_PAYMENT") return "รอชำระเงิน";
+  if (b.status === "CONFIRMED") return "ชำระเงินแล้ว";
 
   if (
     b.checkinCheckout?.checkInTime &&
@@ -85,181 +95,471 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState(null);
+  const [filter, setFilter] = useState("ALL");
+  const [processingId, setProcessingId] = useState(null);
+  const [now, setNow] = useState(Date.now());
   const navigate = useNavigate();
 
+  //////////////////////////////////////////////////////////
+  // REALTIME CLOCK (Countdown)
+  //////////////////////////////////////////////////////////
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  //////////////////////////////////////////////////////////
+  // FETCH
+  //////////////////////////////////////////////////////////
+
+useEffect(() => {
+  fetchBookings();
+}, []);
+
+async function fetchBookings() {
+  try {
+    const res = await api.get(`/reservations`);
+    setBookings(res.data || []);
+  } catch (err) {
+    if (err.response?.status === 401) {
       navigate("/login");
-      return;
-    }
-    fetchBookings(token);
-  }, [navigate]);
-
-  async function fetchBookings(token) {
-    try {
-      const res = await axios.get(`${API}/reservations`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setBookings(res.data || []);
-    } catch (err) {
+    } else {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
+  } finally {
+    setLoading(false);
   }
+}
+  //////////////////////////////////////////////////////////
+  // FILTER + MEMO
+  //////////////////////////////////////////////////////////
+const statusPriority = {
+  "รอชำระเงิน": 1,
+  "ชำระเงินแล้ว": 2,
+  "กำลังใช้งาน": 3,
+  "เสร็จสิ้น": 4,
+  "ยกเลิกแล้ว": 5,
+  "หมดเวลาชำระ": 6
+};
 
-  const handleCheckin = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${API}/operations/${id}/checkin`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchBookings(token);
-    } catch (err) {
-      alert(err.response?.data?.message || "Check-in ไม่สำเร็จ");
-    }
-  };
+  const [collapsedStatus, setCollapsedStatus] = useState({});
 
-  const handleCheckout = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${API}/operations/${id}/checkout`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchBookings(token);
-    } catch (err) {
-      alert(err.response?.data?.message || "Check-out ไม่สำเร็จ");
-    }
-  };
+const filteredBookings = useMemo(() => {
+  const data =
+    filter === "ALL"
+      ? bookings
+      : bookings.filter(
+          (b) => getStatusText(b) === filter
+        );
+
+  return [...data].sort((a, b) => {
+    const statusA = getStatusText(a);
+    const statusB = getStatusText(b);
+
+    const pA = statusPriority[statusA] ?? 99;
+    const pB = statusPriority[statusB] ?? 99;
+
+    if (pA !== pB) return pA - pB;
+
+    // ถ้า priority เท่ากัน เรียงตามวันที่ใหม่ล่าสุด
+    return new Date(b.startDate) - new Date(a.startDate);
+  });
+}, [bookings, filter]);
+
+  const statusCounts = useMemo(() => {
+    const counts = { ALL: bookings.length };
+    bookings.forEach((b) => {
+      const s = getStatusText(b);
+      counts[s] = (counts[s] || 0) + 1;
+    });
+    return counts;
+  }, [bookings]);
+
+
+// เรียง + group
+const groupedBookings = useMemo(() => {
+  const sorted = [...filteredBookings].sort((a, b) => {
+    const sA = getStatusText(a);
+    const sB = getStatusText(b);
+
+    const pA = statusPriority[sA] ?? 99;
+    const pB = statusPriority[sB] ?? 99;
+
+    if (pA !== pB) return pA - pB;
+
+    return new Date(b.startDate) - new Date(a.startDate);
+  });
+
+  const groups = {};
+
+  sorted.forEach((b) => {
+    const status = getStatusText(b);
+    if (!groups[status]) groups[status] = [];
+    groups[status].push(b);
+  });
+
+  return groups;
+}, [filteredBookings]);
+  //////////////////////////////////////////////////////////
+  // ACTIONS
+  //////////////////////////////////////////////////////////
+
+const handleCheckin = async (id) => {
+  const result = await SwalConfirm({
+    title: "ยืนยัน Check-in ?",
+    text: "เมื่อกดยืนยันจะไม่สามารถย้อนกลับได้"
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await api.post(`${API}/operations/${id}/checkin`);
+
+    SwalToast({
+      icon: "success",
+      title: "Check-in สำเร็จ"
+    });
+
+    fetchBookings();
+  } catch (err) {
+    SwalError({
+      text: err.response?.data?.message
+    });
+  }
+};
+
+
+const handleCheckout = async (id) => {
+  const result = await SwalDanger({
+    title: "ยืนยันคืนรถ ?",
+    text: "โปรดตรวจสอบสภาพรถก่อนกดยืนยัน"
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await api.post(`${API}/operations/${id}/checkout`);
+
+    SwalToast({
+      icon: "success",
+      title: "คืนรถเรียบร้อยแล้ว"
+    });
+
+  fetchBookings();
+  } catch (err) {
+    SwalError({
+      text: err.response?.data?.message
+    });
+  }
+};
+
+  //////////////////////////////////////////////////////////
+  // LOADING
+  //////////////////////////////////////////////////////////
 
   if (loading)
     return <p style={{ textAlign: "center" }}>กำลังโหลด...</p>;
 
-  return (
-    <div style={{ maxWidth: 900, margin: "40px auto" }}>
-      <h2>ประวัติการจอง</h2>
+  //////////////////////////////////////////////////////////
+  // RENDER
+  //////////////////////////////////////////////////////////
 
-      {bookings.length === 0 && <p>ไม่มีรายการจอง</p>}
+// ✅ แทนที่เฉพาะส่วน return()
 
-      {bookings.map((b) => {
-        const isOpen = openId === b.id;
-        const checkin = getCheckinState(b);
+return (
+  <div className="mybookings-wrapper">
+    <h2 className="page-title">ประวัติการจอง</h2>
+
+    {/* FILTER DASHBOARD */}
+    <div className="booking-filters">
+      {Object.keys(statusCounts).map((key) => (
+        <motion.div
+          key={key}
+          whileHover={{ scale: 1.04 }}
+          onClick={() => setFilter(key)}
+          className={`filter-card ${
+            filter === key ? "active" : ""
+          }`}
+        >
+          <div className="filter-label">{key}</div>
+          <motion.div
+            key={statusCounts[key]}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="count"
+          >
+            {statusCounts[key]}
+          </motion.div>
+        </motion.div>
+      ))}
+    </div>
+
+    {Object.entries(groupedBookings).length === 0 && (
+      <p className="empty-state">ไม่มีรายการจอง</p>
+    )}
+
+    {Object.entries(groupedBookings).map(
+      ([status, items]) => {
+        const isCollapsed = collapsedStatus[status];
 
         return (
           <div
-            key={b.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 8,
-              marginBottom: 12,
-              overflow: "hidden",
-            }}
+            key={status}
+            className="status-group"
+            data-status={status}
           >
-            {/* HEADER */}
-            <div
-              onClick={() =>
-                setOpenId(isOpen ? null : b.id)
-              }
-              style={{
-                padding: 15,
-                background: "#f9fafb",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <strong>{b.car?.name}</strong>
-                <div style={{ fontSize: 13, color: "#666" }}>
-                  {new Date(b.startDate).toLocaleDateString()} –{" "}
-                  {new Date(b.endDate).toLocaleDateString()}
-                </div>
-              </div>
 
-              <div>{getStatusText(b)}</div>
+            {/* ===== GROUP HEADER ===== */}
+            <div
+              className="status-group-header"
+              onClick={() =>
+                setCollapsedStatus((prev) => ({
+                  ...prev,
+                  [status]: !prev[status]
+                }))
+              }
+            >
+              <h3>
+                {status} ({items.length})
+              </h3>
+              <span>
+                {isCollapsed ? "▼ เปิด" : "▲ ซ่อน"}
+              </span>
             </div>
 
-            {/* DROPDOWN CONTENT */}
-            {isOpen && (
-              <div style={{ padding: 15 }}>
+            <AnimatePresence>
+              {!isCollapsed &&
+                items.map((b) => {
+                  const isOpen = openId === b.id;
+                  const checkin = getCheckinState(b);
 
-                {/* CHECK-IN */}
-                <button
-                  disabled={!checkin.allowed}
-                  onClick={() => handleCheckin(b.id)}
-                  style={{
-                    opacity: checkin.allowed ? 1 : 0.5,
-                    marginRight: 8,
-                  }}
-                >
-                  Check-in
-                </button>
+                  const remaining =
+                    b.lockExpiresAt &&
+                    new Date(b.lockExpiresAt).getTime() - now;
 
-                {!checkin.allowed && checkin.reason && (
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    {checkin.reason}
-                    {checkin.countdown && (
-                      <div style={{ color: "#d97706" }}>
-                        อีก {checkin.countdown} วัน
+                  const expired = isExpired(b);
+
+                  return (
+                    <motion.div
+                      key={b.id}
+                      layout
+                      className="booking-card"
+                    >
+                      {/* HEADER */}
+                      <div
+                        onClick={() =>
+                          setOpenId(isOpen ? null : b.id)
+                        }
+                        className="booking-header"
+                      >
+                        <div>
+                          <strong>{b.car?.name}</strong>
+                          <div className="booking-dates">
+                            {new Date(
+                              b.startDate
+                            ).toLocaleDateString()}{" "}
+                            –{" "}
+                            {new Date(
+                              b.endDate
+                            ).toLocaleDateString()}
+                          </div>
+                        </div>
+
+                        <div className="status-badge status-waiting">
+                          {getStatusText(b)}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
 
-                {/* CHECK-OUT */}
-                {b.checkinCheckout?.checkInTime &&
-                  !b.checkinCheckout?.checkOutTime && (
-                    <button
-                      onClick={() =>
-                        handleCheckout(b.id)
-                      }
-                      style={{ marginLeft: 8 }}
-                    >
-                      Check-out
-                    </button>
-                  )}
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{
+                              height: 0,
+                              opacity: 0
+                            }}
+                            animate={{
+                              height: "auto",
+                              opacity: 1
+                            }}
+                            exit={{
+                              height: 0,
+                              opacity: 0
+                            }}
+                            className="booking-body"
+                          >
+                            {/* TIMELINE */}
+                            {(() => {
+                              const steps = [
+                                {
+                                  label: "รอชำระเงิน",
+                                  value: "รอชำระเงิน"
+                                },
+                                {
+                                  label: "ชำระเงินแล้ว",
+                                  value: "ชำระเงินแล้ว"
+                                },
+                                {
+                                  label: "กำลังใช้งาน",
+                                  value: "กำลังใช้งาน"
+                                },
+                                {
+                                  label: "เสร็จสิ้น",
+                                  value: "เสร็จสิ้น"
+                                }
+                              ];
 
-                {/* CONTINUE PAYMENT */}
-                {canContinuePayment(b) && (
-                  <button
-                    style={{
-                      background: "#16a34a",
-                      color: "#fff",
-                      marginLeft: 8,
-                    }}
-                    onClick={() =>
-                      navigate(`/payment/${b.id}`)
-                    }
-                  >
-                    ชำระเงินต่อ
-                  </button>
-                )}
+                              const current =
+                                getStatusText(b);
 
-                {/* EXPIRED */}
-                {["PENDING", "WAITING_PAYMENT"].includes(
-                  b.status
-                ) &&
-                  isExpired(b) && (
-                    <div
-                      style={{
-                        color: "red",
-                        fontSize: 12,
-                        marginTop: 8,
-                      }}
-                    >
-                      หมดเวลาชำระเงิน ระบบจะยกเลิกอัตโนมัติ
-                    </div>
-                  )}
-              </div>
-            )}
+                              const currentIndex =
+                                steps
+                                  .map((s) => s.value)
+                                  .indexOf(current);
+
+                              return (
+                                <div
+                                  className={`timeline progress-${currentIndex}`}
+                                >
+                                  {steps.map(
+                                    (step, index) => {
+                                      const isActive =
+                                        index ===
+                                        currentIndex;
+                                      const isCompleted =
+                                        index <
+                                        currentIndex;
+
+                                      return (
+                                        <div
+                                          key={step.label}
+                                          className={`timeline-step
+                                            ${
+                                              isActive
+                                                ? "active"
+                                                : ""
+                                            }
+                                            ${
+                                              isCompleted
+                                                ? "completed"
+                                                : ""
+                                            }`}
+                                        >
+                                          <div className="timeline-dot" />
+                                          <div className="timeline-label">
+                                            {
+                                              step.label
+                                            }
+                                          </div>
+                                        </div>
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              );
+                            })()}
+
+                            {/* COUNTDOWN */}
+                            {canContinuePayment(b) &&
+                              remaining > 0 && (
+                                <div className="countdown">
+                                  หมดเวลาใน{" "}
+                                  {Math.floor(
+                                    remaining /
+                                      1000
+                                  )}{" "}
+                                  วินาที
+                                </div>
+                              )}
+
+                            {b.status ===
+                              "WAITING_PAYMENT" &&
+                              expired && (
+                                <div className="countdown expired">
+                                  หมดเวลาชำระเงิน
+                                </div>
+                              )}
+
+                            {/* ACTIONS */}
+                            <div className="booking-actions">
+                              {canContinuePayment(b) && (
+                                <button
+                                  className="btn-primary"
+                                  onClick={() =>
+                                    navigate(
+                                      `/payment/${b.id}`
+                                    )
+                                  }
+                                >
+                                  ชำระเงินต่อ
+                                </button>
+                              )}
+
+                              {!b
+                                .checkinCheckout
+                                ?.checkInTime &&
+                                b.status ===
+                                  "CONFIRMED" &&
+                                !canContinuePayment(
+                                  b
+                                ) && (
+                                  <button
+                                    className="btn-secondary"
+                                    disabled={
+                                      !checkin.allowed ||
+                                      processingId ===
+                                        b.id
+                                    }
+                                    onClick={() =>
+                                      handleCheckin(
+                                        b.id
+                                      )
+                                    }
+                                  >
+                                    Check-in
+                                  </button>
+                                )}
+
+                              {b
+                                .checkinCheckout
+                                ?.checkInTime &&
+                                !b
+                                  .checkinCheckout
+                                  ?.checkOutTime && (
+                                  <button
+                                    className="btn-success"
+                                    onClick={() =>
+                                      handleCheckout(
+                                        b.id
+                                      )
+                                    }
+                                  >
+                                    Check-out
+                                  </button>
+                                )}
+
+                              {b
+                                .checkinCheckout
+                                ?.checkOutTime && (
+                                  <div className="checkout-badge">
+                                    ✔ คืนรถแล้ว
+                                  </div>
+                                )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+            </AnimatePresence>
           </div>
         );
-      })}
-    </div>
-  );
+      }
+    )}
+  </div>
+);
 }

@@ -1,248 +1,369 @@
-/* ================= BASE ================= */
-.page.container {
+
+/* ================= BASIC SETUP ================= */
+body {
+  color: var(--text);
+  background-color: var(--bg);
+  font-family: 'Prompt', sans-serif; /* แนะนำให้ใช้ฟอนต์ Prompt เพื่อความสวยงามของภาษาไทย */
+}
+
+.container {
   max-width: 1200px;
-  margin: auto;
-  padding: 3rem 1rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-.section {
-  margin-top: 5rem;
-}
+/* Typography Helpers */
+.muted { color: var(--muted); }
+.small { font-size: 0.875rem; }
+.xsmall { font-size: 0.75rem; }
+.text-right { text-align: right; }
+.center { text-align: center; }
+.max-w-xl { max-width: 36rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mt-4 { margin-top: 1.5rem; }
 
-.muted {
-  color: var(--text-muted);
-}
-
-.center {
-  text-align: center;
-}
-
-.small {
-  font-size: 0.85rem;
-}
-
-.xsmall {
-  font-size: 0.75rem;
-}
-
-/* ================= HERO ================= */
-.hero {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 3.5rem;
-  align-items: center;
-}
-
-/* LEFT */
-.hero-title {
-  font-size: clamp(2.3rem, 4vw, 3.2rem);
-  line-height: 1.15;
-  font-weight: 800;
-}
-
-.hero-title .primary {
-  color: var(--primary);
-}
-
-.hero-desc {
-  margin: 1.5rem 0 2rem;
-  max-width: 520px;
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.hero-badges {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  flex-wrap: wrap;
-  opacity: 0.85;
-}
-
-.hero-actions .btn {
-  min-width: 100px;
-  height: 42px;
-
+/* Buttons */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  text-decoration: none; /* สำหรับ Link */
-}
-
-
-/* ================= BUTTON ================= */
-.btn {
-  padding: 0.85rem 1.7rem;
+  height: 48px;
+  padding: 0 28px;
   border-radius: 12px;
-  font-size: 1rem;
-  cursor: pointer;
-  border: none;
   font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
   transition: all 0.25s ease;
+  white-space: nowrap;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #ff4d4d);
+  background-color: var(--primary);
   color: white;
-  box-shadow: 0 10px 25px rgba(255, 0, 0, 0.25);
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
 }
 
 .btn-primary:hover {
+  background-color: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(255, 0, 0, 0.35);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .btn-outline {
-  background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
+  background-color: transparent;
+  color: var(--text);
+  border: 2px solid var(--border);
 }
 
 .btn-outline:hover {
-  background: var(--primary);
-  color: white;
+  border-color: var(--text);
+  background-color: #f8fafc;
 }
 
-/* ================= HIGHLIGHT (Right Card) ================= */
+.btn-lg {
+  height: 54px;
+  padding: 0 36px;
+  font-size: 1.1rem;
+}
+
+/* ================= PAGE ANIMATIONS ================= */
+.home-page { animation: fadeInPage 0.6s ease; }
+@keyframes fadeInPage { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ================= HERO SECTION ================= */
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+  min-height: 35vh;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.hero-left { animation: fadeUp 0.8s ease forwards; }
+
+.hero-badge-top {
+  display: inline-block;
+  padding: 6px 14px;
+  background-color: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.hero-title .primary { color: var(--primary); }
+
+.hero-desc {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 520px;
+  margin-bottom: 1rem;
+}
+
+.hero-highlight-text {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Hero Actions & Desktop Fix */
+.hero-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+/* Hero Badges */
+.hero-badges {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.hero-badges .icon { color: var(--primary); font-style: normal; font-weight: bold;}
+
+/* ================= HIGHLIGHT CARD ================= */
 .highlight {
   position: relative;
-}
-
-.highlight-bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    transparent
-  );
-  border-radius: 28px;
-  opacity: 0.15;
+  animation: fadeLeft 1s ease forwards;
 }
 
 .highlight-card {
-  position: relative;
   background: var(--card);
-  border-radius: 22px;
-  padding: 2rem;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
+  border-radius: 24px;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.highlight-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.highlight-image-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background-color: #f1f5f9;
+  height: 200px; /* Fix height for the image */
+}
+
+.highlight-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.highlight-card:hover .highlight-image {
+  transform: scale(1.05);
 }
 
 .highlight-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   gap: 1rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--border);
 }
 
 .highlight-title {
   font-size: 1.4rem;
   font-weight: 700;
-}
-
-.price-box {
-  text-align: right;
+  margin: 4px 0;
 }
 
 .price {
-  font-size: 1.8rem;
-  color: var(--primary);
+  font-size: 2rem;
   font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
 }
 
 .highlight-bottom {
-  display: flex;
-  gap: 1.2rem;
   margin-top: 1.2rem;
-  font-size: 0.9rem;
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.badge-pill {
+  background: var(--bg-soft);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 500;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
 }
 
 .highlight-emoji {
   position: absolute;
-  right: -14px;
-  bottom: -14px;
-  font-size: 3.2rem;
+  right: -15px;
+  bottom: -15px;
+  font-size: 3rem;
+  animation: float 4s ease-in-out infinite;
+
+  color: var(--text);
+  border-radius: 50%;
+  padding: 10px;
+
+  transition: background var(--transition),
+              border var(--transition);
 }
 
-/* ================= FEATURES ================= */
+@keyframes float {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* ================= FEATURES SECTION ================= */
+
+
 .section-header {
-  max-width: 620px;
-  margin: auto;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  animation: fadeUp 0.9s ease forwards;
 }
 
 .section-header h2 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
 }
 
-.grid {
+/* CSS Grid Auto-fit: ตอบโจทย์ Responsive สุดๆ */
+.grid-features {
   display: grid;
-  gap: 1.8rem;
-}
-
-.grid-2 {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
 }
 
 .card {
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
   background: var(--card);
-  border-radius: 18px;
-  padding: 1.8rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
+  animation: fadeUp 0.8s ease forwards;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.15);
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+  background: var(--primary-soft);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
 }
 
 .card h3 {
-  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 900px) {
+.card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.card:hover {
+  border-color: var(--primary);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ================= CTA BOTTOM ================= */
+.cta-bottom {
+  margin-top: 3rem;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, var(--primary-soft) 0%, transparent 100%);
+  border-radius: 30px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.cta-content h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+/* ==================================================
+   RESPONSIVE QUERIES
+   ================================================== */
+@media (max-width: 992px) {
   .hero {
     grid-template-columns: 1fr;
+    gap: 3rem;
+    padding-top: 1rem;
+    text-align: center;
+  }
+  
+  .hero-desc { margin: 1rem auto; }
+  
+  .hero-actions {
+    justify-content: center;
   }
 
-  .highlight {
-    margin-top: 2.5rem;
+  .hero-badges {
+    justify-content: center;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .hero-actions {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
     width: 100%;
   }
 
-  .btn {
-    width: 100%;
-    text-align: center;
+  .highlight-emoji {
+    right: 10px;
+    bottom: -20px;
   }
+}
 
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-
-  .highlight-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .price-box {
-    text-align: left;
-  }
+@media (max-width: 480px) {
+  .highlight-card { padding: 1.2rem; }
+  .highlight-top { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .price-box { align-self: flex-start; }
+  .text-right { text-align: left; }
+  .card { padding: 1.5rem; }
 }

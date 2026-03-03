@@ -1,38 +1,589 @@
+/* =========================================================
+   CAR DETAIL — PREMIUM CLEAN VERSION
+   Works with Global Design System (Red Minimal)
+   ========================================================= */
+
+
+/* ================= PAGE ================= */
+
+.car-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+
+/* ================= HERO ================= */
+
+.car-detail-hero {
+  position: relative;
+  display: flex;
+  gap: 50px;
+  margin-bottom: 80px;
+  padding: 50px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+
+  background: linear-gradient(
+    135deg,
+    #b80000,
+    var(--primary),
+    #ff3b3b
+  );
+
+  color: #ffffff;
+  box-shadow: 0 30px 80px rgba(225, 6, 0, 0.25);
+}
+
+/* Subtle glass highlight */
+.car-detail-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(255,255,255,0.15),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.car-detail-image-wrap {
+  width: 520px;
+  height: 340px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+
+.car-detail-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.car-detail-image-wrap:hover img {
+  transform: scale(1.08);
+}
+
+.car-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.car-detail-info h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.car-detail-rating {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.car-detail-meta {
+  display: flex;
+  gap: 20px;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+.car-detail-price {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-top: 8px;
+}
+
+
+/* ================= SECTION ================= */
+
+.car-detail-section {
+  margin-bottom: 70px;
+}
+
+.car-detail-section h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+
+
+/* ================= DETAIL BOX ================= */
+
+.car-detail-box {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 42px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+  transition: var(--transition);
+}
+
+.car-detail-box:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.08);
+}
+
+
+/* ================= DETAIL GRID ================= */
+
+.car-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  background: var(--bg-soft);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.detail-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(225,6,0,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.detail-item.highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(225,6,0,0.10),
+    rgba(225,6,0,0.04)
+  );
+  border: 1px solid rgba(225,6,0,0.25);
+  box-shadow: 0 10px 30px rgba(225,6,0,0.08);
+}
+
+.detail-item.highlight .detail-value {
+  color: var(--primary);
+}
+
+
+/* ================= FEATURES ================= */
+
+.section-subtitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-soft);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.feature-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(225,6,0,0.25);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+
+/* ================= DESCRIPTION ================= */
+
+.description-box {
+  margin-top: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(225,6,0,0.05),
+    rgba(225,6,0,0.02)
+  );
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(225,6,0,0.15);
+  line-height: 1.7;
+  color: var(--text);
+}
+/* ===================================
+   YEAR FILTER — FULL RESPONSIVE
+   =================================== */
+
+.car-detail-section .year-filter-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 30px;
+  transition: var(--transition);
+}
+
+.car-detail-section .year-label {
+  font-family: "TH Sarabun New", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.car-detail-section .select-wrapper {
+  position: relative;
+  width: 170px;
+}
+
+.car-detail-section .year-select {
+  appearance: none;
+  width: 100%;
+  height: 48px;
+  padding: 0 42px 0 18px;
+
+  font-size: 20px;
+  font-family: "TH Sarabun New", sans-serif;
+
+  border-radius: 14px;
+  border: 2px solid var(--border);
+
+  background: var(--bg-soft);
+  color: var(--text);
+
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* Hover */
+.car-detail-section .year-select:hover {
+  border-color: var(--primary);
+}
+
+/* Focus */
+.car-detail-section .year-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+/* Arrow */
+.select-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+
+/* ===================================
+   DARK MODE
+   =================================== */
+
+[data-theme="dark"] .car-detail-section .year-select {
+  background: #1f1f23;
+  border-color: #2a2a2e;
+}
+
+[data-theme="dark"] .car-detail-section .year-filter-card {
+  box-shadow: none;
+}
+
+
+/* ===================================
+   TABLET (≤ 900px)
+   =================================== */
+
+@media (max-width: 900px) {
+
+  .car-detail-section .year-filter-card {
+    padding: 16px 18px;
+  }
+
+  .car-detail-section .year-label {
+    font-size: 18px;
+  }
+
+  .car-detail-section .year-select {
+    height: 46px;
+    font-size: 18px;
+  }
+}
+
+
+/* ===================================
+   MOBILE (≤ 600px)
+   =================================== */
+
+@media (max-width: 600px) {
+
+  .car-detail-section .year-filter-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .car-detail-section .select-wrapper {
+    width: 100%;
+  }
+
+  .car-detail-section .year-select {
+    width: 100%;
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+
+/* ===================================
+   SMALL MOBILE (≤ 400px)
+   =================================== */
+
+@media (max-width: 400px) {
+
+  .car-detail-section .year-label {
+    font-size: 17px;
+  }
+
+  .car-detail-section .year-select {
+    font-size: 16px;
+  }
+}
+
+/* ================= CALENDAR ================= */
+
 .year-calendar {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
-  margin-top: 30px;
 }
 
 .month-block {
-  background: #fff;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  background: var(--card);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: var(--transition);
+}
+
+.month-block:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.08);
+}
+
+.month-block h3 {
+  margin-bottom: 16px;
+  font-weight: 700;
 }
 
 .availability-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 8px;
 }
 
 .availability-day {
-  padding: 6px;
+  padding: 10px 0;
   text-align: center;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
 }
 
+/* Available */
 .available {
-  background: #e8f5e9;
+  background: #16a34a;
+  color: #ffffff;
 }
 
+.available:hover {
+  background: #15803d;
+  box-shadow: 0 4px 14px rgba(22,163,74,0.4);
+}
+
+/* Unavailable */
 .unavailable {
-  background: #ffebee;
+  background: #dc2626;
+  color: #ffffff;
 }
 
+.unavailable:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 14px rgba(220,38,38,0.4);
+}
+
+/* Today */
 .today {
-  border: 2px solid #1976d2;
+  border: 2px solid #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+
+/* ================= LEGEND ================= */
+
+.calendar-legend {
+  display: flex;
+  gap: 26px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.available-dot { background: #16a34a; }
+.unavailable-dot { background: #dc2626; }
+.today-dot { border: 2px solid #2563eb; }
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+  .car-detail-hero {
+    flex-direction: column;
+    padding: 32px;
+    gap: 30px;
+  }
+
+  .car-detail-image-wrap {
+    width: 100%;
+    height: 260px;
+  }
+
+  .car-detail-info h1 {
+    font-size: 1.8rem;
+  }
+
+  .year-filter-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .select-wrapper {
+    width: 100%;
+  }
+}
+
+/* ===================================
+   BTN BOOK — LIGHT / DARK READY
+   =================================== */
+
+.btn-book {
+  position: relative;
+  overflow: hidden;
+
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 28px;
+  min-height: 48px;
+  border-radius: 14px;
+  letter-spacing: 0.3px;
+
+  border: 1px solid rgba(0,0,0,0.08);
+
+  /* Light Mode Default */
+  background: linear-gradient(135deg, #f5f5f5, #ffffff);
+  color: #111111;
+
+  transition: all 0.3s ease;
+}
+
+/* Hover Light */
+.btn-book:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  color: #000;
+}
+
+/* Subtle Shine */
+.btn-book::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.btn-book:hover::after {
+  opacity: 1;
+}
+
+
+/* ===================================
+   DARK MODE
+   =================================== */
+
+[data-theme="dark"] .btn-book {
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: linear-gradient(
+    135deg,
+    #1f1f24,
+    #141417
+  );
+
+  color: #ffffff;
+}
+
+[data-theme="dark"] .btn-book:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .btn-book::after {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.1),
+    transparent
+  );
 }

@@ -9,6 +9,8 @@ export default function ThemeToggle({ compact = false }) {
       className={`theme-toggle-btn ${compact ? "compact" : ""}`}
       onClick={toggleTheme}
       aria-label="Toggle theme"
+      aria-pressed={theme === "dark"}
+      type="button"
     >
       <span className="theme-track">
         <span className={`theme-thumb ${theme}`} />
@@ -16,7 +18,9 @@ export default function ThemeToggle({ compact = false }) {
 
       {!compact && (
         <span className="theme-label">
-          {theme === "light" ? "Dark Mode" : "Light Mode"}
+          {theme === "light"
+            ? "เปลี่ยนเป็น Dark Mode"
+            : "เปลี่ยนเป็น Light Mode"}
         </span>
       )}
     </button>

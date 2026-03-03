@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/utils/api";
 import Swal from "sweetalert2";
 import "../styles/admin-users.css";
 
@@ -11,38 +11,33 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({});
-  const token = localStorage.getItem("token");
 
-  /* ================= LOAD USERS (React 19 Safe) ================= */
+   /* ================= LOAD USERS ================= */
 
   useEffect(() => {
-    if (!token) return;
-
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get(`${API}/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(res.data);
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "โหลดข้อมูลไม่สำเร็จ", "error");
-      }
-    };
-
     fetchUsers();
-  }, [token]);
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await api.get("/users");
+      setUsers(res.data);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        window.location.href = "/login";
+      }
+      Swal.fire("Error", "โหลดข้อมูลไม่สำเร็จ", "error");
+    }
+  };
+
 
   /* ================= REFRESH USERS ================= */
 
   const refreshUsers = async () => {
     try {
-      const res = await axios.get(`${API}/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/users");
       setUsers(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch {
       Swal.fire("Error", "รีเฟรชข้อมูลไม่สำเร็จ", "error");
     }
   };
@@ -53,11 +48,7 @@ export default function AdminUsers() {
     if (!selectedUser) return;
 
     try {
-      await axios.put(
-        `${API}/users/${selectedUser.id}`,
-        form,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/users/${selectedUser.id}`, form);
 
       await refreshUsers();
       setSelectedUser(null);
@@ -96,10 +87,7 @@ export default function AdminUsers() {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${API}/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await api.delete(`/users/${id}`);
       await refreshUsers();
 
       Swal.fire({
@@ -128,6 +116,7 @@ export default function AdminUsers() {
     });
     setEditMode(false);
   };
+
 
   /* ================= FILTER ================= */
 

@@ -1,17 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- THEME INIT (กัน flash ก่อน React โหลด) -->
+    <script>
+      (function () {
+        try {
+          const saved = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = saved || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- FAVICON -->
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+    <!-- VIEWPORT -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Car Rental — เช่ารถหาดใหญ่ สงขลา</title>
-    <meta name="description" content="บริการรถเช่าหาดใหญ่ สงขลา ราคาพิเศษ พร้อมรับ–คืนที่สนามบิน และบริการส่งรถ ถึงที่" />
+
+    <!-- SEO -->
+    <title>WWJ Car Rental — เช่ารถหาดใหญ่ สงขลา</title>
+    <meta
+      name="description"
+      content="บริการรถเช่าหาดใหญ่ สงขลา ราคาพิเศษ พร้อมรับ–คืนที่สนามบิน และบริการส่งรถถึงที่"
+    />
+
+    <!-- OPEN GRAPH -->
     <meta property="og:title" content="WWJ Car Rental — เช่ารถหาดใหญ่ สงขลา" />
-    <meta property="og:description" content="บริการรถเช่าหาดใหญ่ สงขลา ราคาพิเศษ พร้อมรับ–คืนที่สนามบิน และบริการส่งรถ ถึงที่" />
+    <meta
+      property="og:description"
+      content="บริการรถเช่าหาดใหญ่ สงขลา ราคาพิเศษ พร้อมรับ–คืนที่สนามบิน และบริการส่งรถถึงที่"
+    />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="th_TH" />
+
+    <!-- PERFORMANCE -->
+    <meta name="theme-color" content="#111827" />
   </head>
+
   <body>
     <div id="root"></div>
+
+    <!-- React Entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -1,99 +1,88 @@
 /* ================= AUTH PAGE ================= */
 .auth-page {
+  min-height: 60vh;
   display: flex;
   justify-content: center;
-  padding: 2rem 1.5rem 0;
-  background: transparent;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--bg);
 }
-
-.auth-card {
-  margin-top: 10rem;
-  /* ปรับได้ */
-}
-
-
 
 /* ================= CARD ================= */
 .auth-card {
   width: 100%;
   max-width: 420px;
   background: var(--card);
-  border-radius: 20px;
-  padding: 2.2rem 2rem;
+  border-radius: 22px;
+  padding: 2.4rem 2rem;
   border: 1px solid var(--border);
-
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-
-  /* animation */
-  opacity: 0;
-  transform: translateY(16px);
-  transition: all 0.45s ease;
-  animation: fadeUp 0.45s ease forwards;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  animation: fadeUp 0.4s ease forwards;
 }
 
 @keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.auth-card.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* ================= TITLE ================= */
 .auth-title {
   text-align: center;
   margin-bottom: 1.8rem;
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 700;
-  color: var(--text);
 }
 
 /* ================= INPUT ================= */
 .input-group {
   position: relative;
-  margin-bottom: 1.1rem;
-}
-
-.input-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  opacity: 0.6;
+  margin-bottom: 1.2rem;
 }
 
 .input-group input {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.8rem;
+  padding: 0.85rem 1rem;
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--bg);
-  color: var(--text);
   font-size: 0.95rem;
   transition: all 0.25s ease;
-}
-
-.input-group input::placeholder {
-  color: var(--text-muted);
 }
 
 .input-group input:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
   background: var(--card);
-  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.15);
+}
+
+/* PASSWORD TOGGLE */
+.password-group {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
 }
 
 /* ================= BUTTON ================= */
 .auth-button {
   width: 100%;
-  margin-top: 0.6rem;
-  padding: 0.8rem;
+  margin-top: 0.8rem;
+  padding: 0.9rem;
   border-radius: 14px;
   border: none;
   background: var(--primary);
@@ -102,21 +91,41 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .auth-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(255, 0, 0, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(59,130,246,0.35);
 }
 
-.auth-button:active {
-  transform: translateY(0);
+.auth-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* LOADER */
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ================= NOTE ================= */
 .auth-note {
   text-align: center;
-  margin-top: 1.2rem;
+  margin-top: 1.4rem;
   font-size: 0.9rem;
   color: var(--text-muted);
 }
@@ -134,7 +143,7 @@
 /* ================= RESPONSIVE ================= */
 @media (max-width: 480px) {
   .auth-card {
-    padding: 1.8rem 1.4rem;
+    padding: 2rem 1.4rem;
   }
 
   .auth-title {

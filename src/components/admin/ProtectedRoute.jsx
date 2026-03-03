@@ -1,21 +1,30 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProtectedRoute({ children, role }) {
-  const token = localStorage.getItem("token");
+  const { user, loading } = useAuth();
 
-  if (!token) {
+  //////////////////////////////////////////////////////
+  // รอโหลด user จาก AuthProvider
+  //////////////////////////////////////////////////////
+  if (loading) {
+    return <div style={{ padding: 20 }}>กำลังโหลด...</div>;
+  }
+
+  //////////////////////////////////////////////////////
+  // ยังไม่ login
+  //////////////////////////////////////////////////////
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-
-    if (role && payload.role !== role) {
-      return <Navigate to="/" replace />;
-    }
-
-    return children;
-  } catch {
-    return <Navigate to="/login" replace />;
+  //////////////////////////////////////////////////////
+  // มี role requirement
+  //////////////////////////////////////////////////////
+  if (role && user.role !== role) {
+    return <Navigate to="/" replace />;
   }
+
+  //////////////////////////////////////////////////////
+  return children;
 }

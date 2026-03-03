@@ -4,14 +4,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-const API = import.meta.env.VITE_API_URL;
+import api from "@/utils/axios";
+import "./styles/Payment.css";
 
 export default function Payment() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
   const [reservation, setReservation] = useState(null);
   const [qrCode, setQrCode] = useState("");
@@ -23,69 +21,72 @@ export default function Payment() {
   //////////////////////////////////////////////////////
   useEffect(() => {
     async function fetchReservation() {
-      const res = await axios.get(
-        `${API}/reservations/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      try {
+        const res = await api.get(`/reservations/${id}`, {
+          skipLoading: true,
+        });
 
-      setReservation(res.data);
-      setPageLoading(false);
+        setReservation(res.data);
+      } catch (err) {
+        navigate("/carslist");
+      } finally {
+        setPageLoading(false);
+      }
     }
 
-    if (id && token) fetchReservation();
-  }, [id, token]);
+    if (id) fetchReservation();
+  }, [id, navigate]);
 
   //////////////////////////////////////////////////////
-  // CREATE QR ONCE
+  // CREATE QR
   //////////////////////////////////////////////////////
   useEffect(() => {
     if (!reservation) return;
     if (qrCode) return;
 
+    if (!["PENDING", "WAITING_PAYMENT"].includes(reservation.status))
+      return;
+
     async function createQR() {
-      const res = await axios.post(
-        `${API}/payments/confirm`,
-        { reservationId: reservation.id },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      try {
+        const res = await api.post(
+          `/payments/create-qr`,
+          { reservationId: reservation.id },
+          { skipLoading: true }
+        );
 
-      setQrCode(res.data.qrImage);
+        setQrCode(res.data.qrImage);
+      } catch {
+        navigate("/carslist");
+      }
     }
 
-    if (
-      ["PENDING", "WAITING_PAYMENT"].includes(
-        reservation.status
-      )
-    ) {
-      createQR();
-    }
-  }, [reservation?.id]);
+    createQR();
+  }, [reservation?.id, reservation?.status]);
 
   //////////////////////////////////////////////////////
-  // AUTO REFRESH STATUS
+  // POLLING STATUS
   //////////////////////////////////////////////////////
   useEffect(() => {
     if (!reservation) return;
+    if (reservation.status === "CONFIRMED") return;
 
     const interval = setInterval(async () => {
-      const res = await axios.get(
-        `${API}/payments/status/${reservation.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      try {
+        const res = await api.get(
+          `/payments/status/${reservation.id}`,
+          { skipLoading: true }
+        );
 
-      if (res.data.reservationStatus === "CONFIRMED") {
-        navigate(`/reservations/${reservation.id}`);
-      }
+        if (res.data.reservationStatus === "CONFIRMED") {
+          clearInterval(interval);
+          navigate(`/reservations/${reservation.id}`);
+        }
+      } catch {}
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [reservation?.id]);
+  }, [reservation?.id, reservation?.status, navigate]);
 
   //////////////////////////////////////////////////////
   // COUNTDOWN
@@ -99,6 +100,7 @@ export default function Payment() {
 
     const interval = setInterval(() => {
       const diff = expireTime - Date.now();
+
       if (diff <= 0) {
         clearInterval(interval);
         navigate("/carslist");
@@ -108,14 +110,16 @@ export default function Payment() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [reservation?.id]);
+  }, [reservation?.lockExpiresAt, navigate]);
 
+  //////////////////////////////////////////////////////
   if (pageLoading)
     return <p style={{ textAlign: "center" }}>Loading...</p>;
 
   if (!reservation)
     return <Navigate to="/carslist" />;
 
+  //////////////////////////////////////////////////////
   const formatTime = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -124,29 +128,53 @@ export default function Payment() {
       .padStart(2, "0")}`;
   };
 
+  //////////////////////////////////////////////////////
   return (
-    <div style={{ textAlign: "center", padding: 40 }}>
-      <h2>PromptPay Payment</h2>
-      <h3>Reservation #{reservation.id}</h3>
-      <h3>฿{reservation.totalPrice}</h3>
+    <div className="payment-page">
+      <div className="payment-card">
 
-      {reservation.lockExpiresAt && (
-        <h2 style={{ color: "red" }}>
-          Time left: {formatTime(timeLeft)}
+        <h2 className="payment-title">
+          PromptPay Payment
         </h2>
-      )}
 
-      {qrCode ? (
-        <img
-          src={qrCode}
-          alt="QR Code"
-          style={{ width: 280 }}
-        />
-      ) : (
-        <p>Generating QR...</p>
-      )}
+        <div className="payment-summary">
+          <div className="payment-row">
+            <span>Reservation</span>
+            <span>#{reservation.id}</span>
+          </div>
 
-      <p>Status: {reservation.status}</p>
+          <div className="payment-total">
+            <span>ยอดที่ต้องชำระ</span>
+            <span>
+              ฿{reservation.totalPrice.toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        {reservation.lockExpiresAt && (
+          <div className="payment-timer">
+            ⏳ ชำระเงินภายใน
+            <strong>{formatTime(timeLeft)}</strong>
+          </div>
+        )}
+
+        <div className="qr-wrapper">
+          {qrCode ? (
+            <img src={qrCode} alt="QR Code" />
+          ) : (
+            <div className="qr-loading">
+              Generating QR...
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`payment-status status-${reservation.status}`}
+        >
+          {reservation.status}
+        </div>
+
+      </div>
     </div>
   );
 }

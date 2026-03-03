@@ -1,29 +1,23 @@
 /* =====================================================
-   ADMIN USERS — PREMIUM SAAS (FULL VERSION)
-   Mobile Bottom Sheet + UX Improved
+   ADMIN USERS — FULL CLEAN RESPONSIVE VERSION
+   Light/Dark Mode Compatible
+   Minimal / Structured / No Bloat Hover
    ===================================================== */
+
 
 /* ================= PAGE ================= */
 
 .admin-users {
-  padding: 36px 24px;
+  padding: 40px 24px;
   color: var(--text);
 }
-/* ================= FORM GROUP ================= */
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 14px;
+.admin-users h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
 }
 
-.form-group label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text-muted);
-  letter-spacing: 0.4px;
-}
 
 /* ================= SEARCH ================= */
 
@@ -38,27 +32,30 @@
   font-size: 0.95rem;
   color: var(--text);
   margin-bottom: 30px;
-  transition: 0.25s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-/* ================= TABLE CARD ================= */
+
+/* =====================================================
+   TABLE CARD
+   ===================================================== */
 
 .table-card {
   width: 100%;
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--card);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.06);
 }
 
-/* ================= TABLE ================= */
+
+/* =====================================================
+   TABLE
+   ===================================================== */
 
 .admin-table {
   width: 100%;
@@ -69,22 +66,27 @@
 
 .admin-table th,
 .admin-table td {
-  padding: 20px 24px;
+  padding: 18px 22px;
   border-bottom: 1px solid var(--border);
-  color: var(--text);
 }
 
-/* Header */
+/* ================= HEADER (Theme Safe) ================= */
+
 .admin-table thead {
-  background: linear-gradient(to right, #fafafa, #f4f4f5);
+  background: var(--bg-soft);
 }
 
 .admin-table thead th {
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
   text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 700;
   color: var(--text-muted);
+}
+
+/* Dark Mode Header */
+[data-theme="dark"] .admin-table thead {
+  background: rgba(255,255,255,0.04);
 }
 
 /* Zebra */
@@ -92,81 +94,36 @@
   background: rgba(0,0,0,0.015);
 }
 
-/* Hover FIXED */
-.admin-table tbody tr {
-  transition: 0.25s ease;
-}
-
-.admin-table tbody tr:hover {
-  background: rgba(0,0,0,0.03);
-  transform: translateY(-2px);
-}
-
-.admin-table tbody tr:hover td {
-  color: var(--text);
-}
-
-/* ================= LINKS SAFE ================= */
-
-.admin-table a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.admin-table a:hover {
-  color: var(--primary);
+[data-theme="dark"] .admin-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,0.02);
 }
 
 
-@media (min-width: 769px) {
-
-  .admin-table td .btn {
-    min-width: 80px;
-  }
-
-  .admin-table td .btn + .btn {
-    margin-left: 16px;
-  }
-
-}
-/* ================= DESKTOP BUTTON SPACING ================= */
-@media (min-width: 769px) {
-
-  /* ปุ่มใน table */
-  .admin-table td .btn + .btn {
-    margin-left: 14px;   /* ระยะห่างแนวนอน */
-  }
-
-  /* ปรับ padding cell ฝั่ง action ให้ดูโล่งขึ้น */
-  .admin-table td:last-child {
-    white-space: nowrap;
-  }
-
-}
-
-/* ================= ROLE BADGE ================= */
+/* =====================================================
+   ROLE BADGE
+   ===================================================== */
 
 .role-badge {
-  display: inline-block;
-  padding: 6px 18px;
+  padding: 6px 14px;
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.6px;
 }
 
 .role-badge.user {
   background: rgba(0,0,0,0.05);
-  color: #444;
+  color: var(--text);
 }
 
 .role-badge.admin {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(225, 6, 0, 0.35);
+  background: var(--primary);
+  color: #ffffff;
 }
 
-/* ================= BUTTONS ================= */
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
 .btn-sm {
   min-height: 36px;
@@ -174,38 +131,35 @@
   font-size: 0.8rem;
 }
 
-.btn {
-  border-radius: 14px;
-  font-weight: 600;
-}
-
-/* Outline */
 .btn-outline {
-  background: var(--card);
+  background: transparent;
   border: 1px solid var(--border);
   color: var(--text);
 }
 
-.btn-outline:hover {
-  background: var(--bg-soft);
-  color: var(--text);
-  transform: translateY(-2px);
-}
-
-/* Danger */
 .btn-danger {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
-  color: #ffffff;
-  border: none;
+  background: transparent;
+  border: 1px solid #dc2626;
+  color: #dc2626;
 }
 
-.btn-danger:hover {
-  color: #ffffff;
-  box-shadow: 0 12px 28px rgba(225, 6, 0, 0.35);
-  transform: translateY(-2px);
+
+/* Desktop Button Spacing */
+@media (min-width: 769px) {
+
+  .admin-table td:last-child {
+    white-space: nowrap;
+  }
+
+  .admin-table td .btn + .btn {
+    margin-left: 12px;
+  }
 }
 
-/* ================= MOBILE CARDS ================= */
+
+/* =====================================================
+   MOBILE CARDS
+   ===================================================== */
 
 .mobile-user-list {
   display: none;
@@ -223,36 +177,28 @@
 
   .user-card {
     background: var(--card);
-    border-radius: 22px;
-    padding: 22px;
-    margin-bottom: 20px;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
     border: 1px solid var(--border);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-    transition: 0.25s ease;
-  }
-
-  .user-card:hover {
-    transform: translateY(-3px);
   }
 
   .user-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-size: 0.95rem;
-    color: var(--text);
   }
 
   .label {
     font-size: 0.75rem;
     color: var(--text-muted);
-    font-weight: 500;
   }
 
   .user-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 14px;
   }
 
   .user-actions .btn {
@@ -260,74 +206,89 @@
   }
 }
 
+
 /* =====================================================
-   MODAL — DESKTOP + MOBILE BOTTOM SHEET
+   TABLET OPTIMIZATION
    ===================================================== */
 
-/* Overlay */
+@media (max-width: 992px) {
+
+  .admin-table th,
+  .admin-table td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+  }
+
+}
+
+
+/* =====================================================
+   LARGE SCREEN
+   ===================================================== */
+
+@media (min-width: 1400px) {
+
+  .admin-users {
+    padding: 50px 40px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 22px 28px;
+  }
+
+}
+
+
+/* =====================================================
+   MODAL
+   ===================================================== */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   z-index: 1000;
-  animation: fadeOverlay 0.25s ease;
 }
 
-@keyframes fadeOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Desktop Modal */
 .modal {
   width: 100%;
   max-width: 480px;
   background: var(--card);
-  border-radius: 28px;
-  padding: 32px;
+  border-radius: 22px;
+  padding: 28px;
   border: 1px solid var(--border);
-  box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-  animation: modalFade 0.25s ease;
   color: var(--text);
 }
 
-@keyframes modalFade {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .modal h2 {
-  margin-bottom: 20px;
-  font-size: 1.25rem;
+  margin-bottom: 18px;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
-.modal p {
-  margin-bottom: 10px;
-  font-size: 0.95rem;
-}
-
-/* Inputs inside modal */
 .modal input,
 .modal select {
   width: 100%;
-  min-height: 46px;
-  margin-bottom: 14px;
-  border-radius: 14px;
+  min-height: 44px;
+  margin-bottom: 12px;
+  border-radius: 12px;
 }
 
-/* Actions */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 14px;
+  gap: 12px;
   margin-top: 18px;
 }
+
+.modal-actions .btn {
+  flex: 1;
+}
+
 
 /* ================= MOBILE BOTTOM SHEET ================= */
 
@@ -340,41 +301,15 @@
 
   .modal {
     max-width: 100%;
-    border-radius: 24px 24px 0 0;
-    padding: 26px 20px 28px;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
-    animation: slideUp 0.3s cubic-bezier(.4,0,.2,1);
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
-  /* Drag indicator */
-  .modal::before {
-    content: "";
-    display: block;
-    width: 42px;
-    height: 5px;
-    border-radius: 999px;
-    background: #ccc;
-    margin: 0 auto 18px;
+    border-radius: 20px 20px 0 0;
+    padding: 24px;
   }
 
   .modal-actions {
     flex-direction: column;
-    gap: 12px;
-    margin-top: 22px;
   }
 
   .modal-actions .btn {
     width: 100%;
-    min-height: 50px;
-    font-size: 1rem;
-  }
-
-  .modal {
-    padding-bottom: calc(28px + env(safe-area-inset-bottom));
   }
 }

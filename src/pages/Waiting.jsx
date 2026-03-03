@@ -1,55 +1,106 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const API = import.meta.env.VITE_API_URL;
+import api from "@/utils/axios";
 
 export default function Waiting() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
   const [reservation, setReservation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  const intervalRef = useRef(null);
+
+  //////////////////////////////////////////////////////
+  // POLLING STATUS
+  //////////////////////////////////////////////////////
   useEffect(() => {
-    let interval;
+    if (!id) return;
+
+    let mounted = true;
 
     async function fetchStatus() {
       try {
-        const res = await axios.get(
-          `${API}/reservations/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await api.get(`/reservations/${id}`, {
+          skipLoading: true,
+        });
 
-        setReservation(res.data);
+        if (!mounted) return;
 
-        if (res.data.status === "CONFIRMED") {
-          clearInterval(interval);
-          alert("✅ การชำระเงินสำเร็จ");
-          navigate(`/reservations/${id}`);
+        const data = res.data;
+        setReservation(data);
+        setLoading(false);
+
+        //////////////////////////////////////////////////////
+        // STATUS HANDLING
+        //////////////////////////////////////////////////////
+        if (data.status === "CONFIRMED") {
+          clearInterval(intervalRef.current);
+          navigate(`/reservations/${id}`, { replace: true });
+        }
+
+        if (["CANCELLED", "EXPIRED"].includes(data.status)) {
+          clearInterval(intervalRef.current);
+          navigate("/carslist", { replace: true });
         }
 
       } catch (err) {
-        console.error(err);
+        if (!mounted) return;
+
+        if (err.response?.status === 401) {
+          navigate("/login");
+        } else if (err.response?.status === 404) {
+          navigate("/carslist");
+        } else {
+          console.error("WAITING ERROR:", err);
+        }
       }
     }
 
+    //////////////////////////////////////////////////////
+    // START
+    //////////////////////////////////////////////////////
     fetchStatus();
-    interval = setInterval(fetchStatus, 5000); // 🔄 ทุก 5 วิ
+    intervalRef.current = setInterval(fetchStatus, 5000);
 
-    return () => clearInterval(interval);
+    //////////////////////////////////////////////////////
+    // CLEANUP
+    //////////////////////////////////////////////////////
+    return () => {
+      mounted = false;
+      clearInterval(intervalRef.current);
+    };
+  }, [id, navigate]);
 
-  }, [id, navigate, token]);
+  //////////////////////////////////////////////////////
+  // LOADING
+  //////////////////////////////////////////////////////
+  if (loading)
+    return (
+      <div style={{ textAlign: "center", padding: 60 }}>
+        <h2>กำลังตรวจสอบสถานะ...</h2>
+      </div>
+    );
 
   if (!reservation)
-    return <p style={{ textAlign: "center" }}>กำลังตรวจสอบ...</p>;
+    return (
+      <div style={{ textAlign: "center", padding: 60 }}>
+        <h2>ไม่พบข้อมูลรายการ</h2>
+      </div>
+    );
 
+  //////////////////////////////////////////////////////
+  // UI
+  //////////////////////////////////////////////////////
   return (
-    <div style={{ textAlign: "center", padding: "60px" }}>
+    <div style={{ textAlign: "center", padding: 60 }}>
       <h2>⏳ รอการตรวจสอบการชำระเงิน</h2>
 
       <h3>เลขที่รายการ BL-{reservation.id}</h3>
-      <p>สถานะปัจจุบัน: {reservation.status}</p>
+
+      <p>
+        สถานะปัจจุบัน: <strong>{reservation.status}</strong>
+      </p>
 
       <div
         style={{

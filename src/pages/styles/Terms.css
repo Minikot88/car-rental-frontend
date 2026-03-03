@@ -1,0 +1,176 @@
+/* ================= PAGE ================= */
+.terms-page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease;
+}
+
+.terms-page.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== HEADER FIX HORIZONTAL ===== */
+.terms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;        /* ❌ ห้ามตัดบรรทัด */
+  gap: 16px;
+}
+
+/* ป้องกันข้อความดันปุ่มตกบรรทัด */
+.terms-header h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  white-space: nowrap;      /* ❌ ไม่ให้ขึ้นบรรทัดใหม่ */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* ถ้าจอเล็กมากให้ ... */
+}
+
+/* ปุ่มไม่ยืด */
+.btn-mini {
+  flex-shrink: 0;           /* ❌ ไม่ให้โดนบีบ */
+}
+/* ================= BUTTON ================= */
+.btn-mini {
+  min-height: 34px;
+  padding: 0 16px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  width: auto !important;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(225, 6, 0, 0.25);
+  transition: all 0.25s ease;
+}
+
+.btn-mini:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(225, 6, 0, 0.35);
+}
+
+/* ================= CARD ================= */
+.terms-card {
+  padding: clamp(18px, 2vw, 28px);
+  border-radius: var(--radius-xl);
+  transition: var(--transition);
+}
+
+/* ================= ANIMATION ================= */
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUp 0.6s ease forwards;
+}
+
+.slide-up.delay {
+  animation-delay: 0.2s;
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= TITLE ================= */
+.terms-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+}
+
+.icon {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* ================= LIST ================= */
+.terms-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.terms-card li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-soft);
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+  line-height: 1.5;
+  transition: all 0.25s ease;
+  word-break: break-word;
+}
+
+.terms-card li:hover {
+  transform: translateX(6px);
+  box-shadow: var(--shadow-sm);
+}
+
+.list-icon {
+  color: var(--primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+/* ================= TABLET ================= */
+@media (max-width: 1024px) {
+  .terms-page {
+    gap: 26px;
+  }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+  .terms-header {
+
+    align-items: flex-start;
+  }
+
+  .btn-mini {
+    align-self: flex-end;
+  }
+
+  .terms-card li {
+    padding: 10px 14px;
+  }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+  .terms-page {
+    gap: 22px;
+  }
+
+  .terms-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .btn-mini {
+    font-size: 0.75rem;
+    padding: 0 12px;
+    min-height: 30px;
+  }
+
+  .terms-card {
+    padding: 16px;
+  }
+
+  .terms-card li {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+}

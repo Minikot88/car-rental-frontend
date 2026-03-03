@@ -1,0 +1,242 @@
+/* =========================================================
+   PROFILE PAGE — ULTRA PREMIUM RED (#FF0000)
+   ========================================================= */
+
+/* ================= ROOT RED CONFIG ================= */
+
+:root {
+  --primary: #ff0000;
+  --primary-light: #ff3333;
+  --primary-soft: rgba(255, 0, 0, 0.08);
+  --primary-glow: rgba(255, 0, 0, 0.35);
+}
+
+/* ================= PAGE ================= */
+
+.profile-page {
+  padding: 48px 24px;
+  max-width: 900px;
+  margin: auto;
+}
+
+/* ================= HEADER ================= */
+
+.ultra-header {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-bottom: 42px;
+}
+
+.ultra-avatar {
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #ff1a1a,
+    #ff0000
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  box-shadow:
+    0 15px 45px rgba(255, 0, 0, 0.35),
+    inset 0 0 18px rgba(255,255,255,0.25);
+  transition: all 0.3s ease;
+}
+
+.ultra-avatar:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 20px 55px rgba(255, 0, 0, 0.5);
+}
+
+.ultra-username {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.ultra-badge {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
+  border: 1px solid rgba(255, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+/* ================= CARD ================= */
+
+.profile-card {
+  position: relative;
+  border-radius: 22px;
+  padding: 40px;
+  overflow: hidden;
+  transition: 0.35s ease;
+}
+
+.profile-glass {
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.85),
+    rgba(255,255,255,0.7)
+  );
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] .profile-glass {
+  background: linear-gradient(
+    145deg,
+    rgba(28,28,32,0.9),
+    rgba(22,22,26,0.8)
+  );
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ================= BORDER GLOW ================= */
+
+.ultra-border-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 22px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    #ff0000,
+    transparent,
+    #ff0000
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ================= GRID ================= */
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+/* ================= ITEM ================= */
+
+.ultra-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--bg-soft);
+  transition: 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.ultra-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(255, 0, 0, 0.18);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.ultra-item.full {
+  grid-column: span 2;
+}
+
+/* ================= TEXT ================= */
+
+.ultra-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: #ff0000;
+  opacity: 0.8;
+}
+
+.ultra-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ================= SPINNER ================= */
+
+.ultra-spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(0,0,0,0.08);
+  border-top: 3px solid #ff0000;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  animation: ultraSpin 0.8s linear infinite;
+}
+
+@keyframes ultraSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================= FADE IN ================= */
+
+.ultra-fade {
+  animation: ultraFade 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes ultraFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+  .ultra-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ultra-item.full {
+    grid-column: span 1;
+  }
+
+  .ultra-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 2rem;
+  }
+
+  .profile-card {
+    padding: 28px;
+  }
+
+}

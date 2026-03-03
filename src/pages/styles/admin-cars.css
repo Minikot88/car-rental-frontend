@@ -1,315 +1,338 @@
 /* =====================================================
-   ADMIN CARS — PREMIUM MINIMAL
-   Fully Compatible with Global Dark Mode
+   ADMIN CARS — ISOLATED CLEAN VERSION
+   (Does NOT modify global.css)
    ===================================================== */
+
+
+/* ================= PAGE ================= */
 
 .admin-cars {
-  padding: 32px 0 60px;
+  padding: 40px 0 70px;
 }
 
-/* =====================================================
-   PAGE HEADER
-   ===================================================== */
 
-.page-header {
+/* ================= HEADER ================= */
+
+.admin-cars .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   gap: 16px;
 }
 
-.page-header h1 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: -0.3px;
+.admin-cars .page-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
 }
 
-.page-header .btn {
-  min-width: 140px;
+.admin-cars .page-header .btn {
+  width: auto;
+  padding: 0 20px;
+  min-height: 42px;
 }
 
-/* Mobile */
 @media (max-width: 640px) {
-  .page-header {
+
+  .admin-cars .page-header {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .page-header .btn {
+  .admin-cars .page-header .btn {
     width: 100%;
   }
 }
+
 
 /* =====================================================
    GRID
    ===================================================== */
 
-.car-grid {
+.admin-cars .car-grid {
   display: grid;
-  gap: 22px;
+  gap: 26px;
+  grid-template-columns: repeat(3, 1fr);
 }
 
-@media (min-width: 768px) {
-  .car-grid {
+@media (min-width: 1400px) {
+  .admin-cars .car-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1099px) {
+  .admin-cars .car-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1100px) {
-  .car-grid {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 575px) {
+  .admin-cars .car-grid {
+    grid-template-columns: 1fr;
   }
 }
+
 
 /* =====================================================
    CARD
    ===================================================== */
 
-.car-card {
+.admin-cars .car-card {
   background: var(--card);
-  border-radius: var(--radius-xl);
-  padding: 22px;
+  border-radius: 20px;
+  padding: 24px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
 }
 
-.car-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-md);
+/* ปิด hover เด้งจาก global */
+.admin-cars .car-card:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-soft);
 }
 
-/* Header */
-.car-header {
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.admin-cars .car-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
 }
 
-.car-title {
+.admin-cars .car-title {
   font-weight: 700;
-  font-size: 1rem;
-  margin-bottom: 4px;
+  font-size: 1.05rem;
 }
 
-.car-sub {
+.admin-cars .car-sub {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
 
-/* Price */
-.car-price {
-  font-weight: 700;
-  font-size: 1rem;
+.admin-cars .car-price {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--primary);
   text-align: right;
 }
 
-.car-price span {
+.admin-cars .car-price span {
   display: block;
   font-size: 0.75rem;
-  font-weight: 500;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 6px;
 }
 
-/* Description */
-.car-desc {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  min-height: 38px;
-}
 
 /* =====================================================
-   ACTIONS
+   DESCRIPTION
    ===================================================== */
 
-.car-actions {
+.admin-cars .car-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+   ===================================================== */
+
+.admin-cars .car-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   margin-top: auto;
 }
 
-.car-actions .btn {
+.admin-cars .car-actions .btn {
   flex: 1;
-  min-height: 38px;
+  min-height: 40px;
   font-size: 0.85rem;
+  border-radius: 12px;
 }
 
-/* Danger button */
-.btn-danger {
-  background: #dc2626;
-  color: #ffffff;
+
+/* EDIT BUTTON (neutral) */
+
+.admin-cars .btn-outline {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
-.btn-danger:hover {
-  background: #b91c1c;
-  color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(220,38,38,0.35);
+.admin-cars .btn-outline:hover {
+  background: var(--bg-soft);
 }
+
+
+/* DELETE BUTTON — FORCE RED (override global safely) */
+
+.admin-cars .btn-danger {
+  background: #dc2626 !important;
+  border: 1px solid #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.admin-cars .btn-danger:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
 
 /* =====================================================
    EMPTY STATE
    ===================================================== */
 
-.empty-state {
+.admin-cars .empty-state {
   text-align: center;
-  padding: 80px 20px;
+  padding: 110px 20px;
   color: var(--text-muted);
 }
 
-.empty-state p {
-  margin-bottom: 16px;
-  font-size: 0.95rem;
+.admin-cars .empty-state p {
+  margin-bottom: 20px;
 }
+
 
 /* =====================================================
-   SKELETON LOADING
+   SKELETON
    ===================================================== */
 
-.skeleton {
-  height: 150px;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(
-    90deg,
-    var(--bg-soft) 25%,
-    var(--border) 37%,
-    var(--bg-soft) 63%
-  );
-  background-size: 400% 100%;
-  animation: shimmer 1.4s infinite;
+.admin-cars .skeleton {
+  height: 160px;
+  border-radius: 20px;
+  background: var(--bg-soft);
 }
 
-@keyframes shimmer {
-  0% { background-position: 100% 0 }
-  100% { background-position: 0 0 }
-}
-
-/* =====================================================
-   MODAL OVERLAY
-   ===================================================== */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0 }
-  to { opacity: 1 }
-}
 
 /* =====================================================
    MODAL
    ===================================================== */
 
-.modal {
+.admin-cars .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.admin-cars .modal {
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
   background: var(--card);
-  border-radius: var(--radius-xl);
-  padding: 28px;
+  border-radius: 22px;
+  padding: 30px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
-  animation: scaleIn 0.2s ease;
 }
 
-@keyframes scaleIn {
-  from { transform: scale(.96); opacity: 0 }
-  to { transform: scale(1); opacity: 1 }
-}
-
-.modal h2 {
+.admin-cars .modal h2 {
   margin-bottom: 20px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.2rem;
 }
 
-/* =====================================================
-   FORM
-   ===================================================== */
 
-.form-group {
+/* FORM */
+
+.admin-cars .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
 }
 
-.form-group label {
+.admin-cars .form-group label {
   font-size: 0.8rem;
-  font-weight: 600;
   margin-bottom: 6px;
   color: var(--text-muted);
 }
 
-.form-group input,
-.form-group textarea {
-  min-height: 42px;
+.admin-cars .form-group input,
+.admin-cars .form-group textarea {
+  min-height: 44px;
 }
 
-.form-group textarea {
-  min-height: 90px;
-  padding-top: 10px;
+.admin-cars .form-group textarea {
+  min-height: 100px;
   resize: none;
 }
 
-/* =====================================================
-   MODAL ACTIONS
-   ===================================================== */
 
-.modal-actions {
+/* MODAL ACTIONS */
+
+.admin-cars .modal-actions {
   display: flex;
   gap: 12px;
   margin-top: 22px;
 }
 
-.modal-actions .btn {
+.admin-cars .modal-actions .btn {
   flex: 1;
 }
 
-/* Mobile bottom sheet style */
-@media (max-width: 480px) {
 
-  .modal-overlay {
-    align-items: flex-end;
-  }
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 
-  .modal {
-    border-radius: 24px 24px 0 0;
-    max-width: 100%;
-  }
+@media (max-width: 768px) {
 
-  .modal-actions {
+  .admin-cars .car-header {
     flex-direction: column;
   }
 
-  .modal-actions .btn {
+  .admin-cars .car-price {
+    text-align: left;
+  }
+
+  .admin-cars .car-actions {
+    flex-direction: column;
+  }
+
+  .admin-cars .car-actions .btn {
     width: 100%;
+  }
+
+  .admin-cars .modal {
+    max-width: 95%;
   }
 }
 
-/* =====================================================
-   DARK MODE ENHANCEMENTS
-   ===================================================== */
+@media (max-width: 480px) {
 
-[data-theme="dark"] .car-card:hover {
-  box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+  .admin-cars .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .admin-cars .modal {
+    border-radius: 24px 24px 0 0;
+    max-width: 100%;
+    padding: 24px;
+  }
+
+  .admin-cars .modal-actions {
+    flex-direction: column;
+  }
 }
 
-[data-theme="dark"] .modal-overlay {
-  background: rgba(0,0,0,0.6);
+
+/* =====================================================
+   DARK MODE SUPPORT
+   ===================================================== */
+
+[data-theme="dark"] .admin-cars .modal-overlay {
+  background: rgba(0,0,0,0.7);
 }

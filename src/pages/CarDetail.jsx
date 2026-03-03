@@ -1,16 +1,17 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import api from "@/utils/axios";
+import { useAuth } from "@/context/AuthContext";
+import { SwalConfirm, SwalError } from "@/utils/swal";
 import "./styles/CarDetail.css";
-
-const API = import.meta.env.VITE_API_URL;
 
 export default function CarDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // ✅ เลือกปีได้
   const [selectedYear, setSelectedYear] = useState(
     new Date().getFullYear()
   );
@@ -19,20 +20,46 @@ export default function CarDetail() {
   // FETCH
   //////////////////////////////////////////////////////
   useEffect(() => {
-    (async () => {
+    const fetchCar = async () => {
       try {
-        const { data } = await axios.get(`${API}/cars/${id}/detail`);
+        const { data } = await api.get(
+          `/cars/${id}/detail`,
+          { skipLoading: true }
+        );
+
         setCar(data);
-      } catch (err) {
-        console.error(err);
+      } catch {
+        SwalError({ title: "ไม่พบข้อมูลรถ" });
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    fetchCar();
   }, [id]);
 
   //////////////////////////////////////////////////////
-  // รวมวันไม่ว่าง
+  // BOOK BUTTON
+  //////////////////////////////////////////////////////
+  const handleBook = async () => {
+    if (!user) {
+      const result = await SwalConfirm({
+        title: "กรุณาเข้าสู่ระบบก่อนทำการจอง",
+        text: "คุณต้องการเข้าสู่ระบบตอนนี้หรือไม่ ?",
+        confirmButtonText: "เข้าสู่ระบบ",
+      });
+
+      if (result.isConfirmed) {
+        navigate("/login");
+      }
+      return;
+    }
+
+    navigate(`/booking/${car.id}`);
+  };
+
+  //////////////////////////////////////////////////////
+  // UNAVAILABLE DATES
   //////////////////////////////////////////////////////
   const unavailableDates = useMemo(() => {
     if (!car?.reservations) return [];
@@ -57,14 +84,19 @@ export default function CarDetail() {
   //////////////////////////////////////////////////////
   const rating = useMemo(() => {
     if (!car?.reviews?.length) return "4.5";
+
     const avg =
       car.reviews.reduce((a, b) => a + b.rating, 0) /
       car.reviews.length;
+
     return avg.toFixed(1);
   }, [car]);
 
+  //////////////////////////////////////////////////////
+  // LOADING
+  //////////////////////////////////////////////////////
   if (loading) return <p>กำลังโหลด...</p>;
-  if (!car) return <p>❌ ไม่พบข้อมูลรถ</p>;
+  if (!car) return null;
 
   const todayStr = new Date().toISOString().split("T")[0];
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -78,7 +110,10 @@ export default function CarDetail() {
       {/* HERO */}
       <div className="car-detail-hero">
         <div className="car-detail-image-wrap">
-          <img src={car.image || "/no-image.png"} alt={car.name} />
+          <img
+            src={car.image || "/no-image.png"}
+            alt={car.name}
+          />
         </div>
 
         <div className="car-detail-info">
@@ -86,7 +121,9 @@ export default function CarDetail() {
 
           <div className="car-detail-rating">
             ⭐ {rating}
-            <span> ({car.reviews?.length || 0} รีวิว)</span>
+            <span>
+              ({car.reviews?.length || 0} รีวิว)
+            </span>
           </div>
 
           <div className="car-detail-meta">
@@ -96,32 +133,49 @@ export default function CarDetail() {
           </div>
 
           <div className="car-detail-price">
-            ฿{car.pricePerDay.toLocaleString()} <span>/วัน</span>
+            ฿{car.pricePerDay.toLocaleString()}
+            <span>/วัน</span>
           </div>
 
           {car.status === "AVAILABLE" && (
-            <Link
-              to={`/booking/${car.id}`}
-              className="btn-primary"
+            <button
+              onClick={handleBook}
+              className="btn btn-book"
             >
               จองรถคันนี้
-            </Link>
+            </button>
           )}
         </div>
       </div>
 
-      {/* YEAR SELECT */}
-      <section className="car-detail-section">
-        <h2>สถานะรถทั้งปี</h2>
+      {/* DETAIL */}
+      <section className="car-detail-section car-detail-box">
+        <h2>รายละเอียดรถ</h2>
 
-        <div style={{ marginBottom: 20 }}>
-          <label>เลือกปี: </label>
-          <input
-            type="number"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
+        <div className="car-detail-grid">
+          <Detail label="แบรนด์" value={car.brand} />
+          <Detail label="รุ่น" value={car.model} />
+          <Detail label="ปี" value={car.year} />
+          <Detail label="เชื้อเพลิง" value={car.fuelType} />
+          <Detail
+            label="เลขไมล์"
+            value={
+              car.mileage
+                ? `${car.mileage.toLocaleString()} กม.`
+                : "-"
+            }
+          />
+          <Detail
+            label="เงินมัดจำ"
+            value={`฿${car.deposit?.toLocaleString() || 0}`}
+            highlight
           />
         </div>
+      </section>
+
+      {/* CALENDAR */}
+      <section className="car-detail-section">
+        <h2>สถานะรถทั้งปี</h2>
 
         <div className="year-calendar">
           {months.map((month) => {
@@ -164,6 +218,16 @@ export default function CarDetail() {
           })}
         </div>
       </section>
+
+    </div>
+  );
+}
+
+function Detail({ label, value, highlight }) {
+  return (
+    <div className={`detail-item ${highlight ? "highlight" : ""}`}>
+      <span className="detail-label">{label}</span>
+      <span className="detail-value">{value}</span>
     </div>
   );
 }
